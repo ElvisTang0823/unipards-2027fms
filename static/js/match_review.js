@@ -1,104 +1,12 @@
-// Copyright 2014 Team 254. All Rights Reserved.
-// Author: pat@patfairbank.com (Patrick Fairbank)
-//
-// Client-side methods for editing a match in the match review page.
+// Copyright 2026 Team 254. All Rights Reserved.
+// 2026 REBUILT Version
 
+const scoreTemplate = Handlebars.compile($("#scoreTemplate").html());
 const allianceResults = {};
 let matchResult;
 
-const ALLIANCES = ["red", "blue"];
-const NUM_ROBOTS = 3;
-const NUM_HUB_SHIFTS = 8;
-const SUMMARY_REFRESH_DELAY_MS = 150;
-const RANKING_POINT_SUMMARY_FIELDS = [
-  "EnergizedBonusRankingPoint",
-  "SuperchargedBonusRankingPoint",
-  "TraversalBonusRankingPoint",
-];
-
-let summaryRefreshTimer;
-let latestSummaryRequestId = 0;
-
-// Hijack the form submission to inject the data in JSON form so that it's easier for the server to parse.
+// 攔截表單提交，將資料轉為 JSON 以利伺服器解析
 $("form").submit(function () {
-  updateAllResults();
-
-  const matchResultJson = JSON.stringify(matchResult);
-
-  // Inject the JSON data into the form as hidden inputs.
-  $("input[name=matchResultJson]").remove();
-  $("<input />").attr("type", "hidden").attr("name", "matchResultJson").attr("value", matchResultJson).appendTo("form");
-
-  return true;
-});
-
-$("form").on("input change", "input, select", function () {
-  scheduleScoreSummaryRefresh();
-});
-
-// Sets up the match-editing form for one alliance based on the cached result data.
-const renderResults = function (alliance) {
-  const result = allianceResults[alliance];
-  result.score = normalizeScore(result.score);
-  result.cards = result.cards || {};
-
-  getInputElement(alliance, "HubWonAuto").prop("checked", result.score.Hub.WonAuto);
-  for (let i = 0; i < NUM_HUB_SHIFTS; i++) {
-    getInputElement(alliance, `HubShiftCount${i}`).val(result.score.Hub.ShiftCounts[i]);
-  }
-
-  for (let i = 0; i < NUM_ROBOTS; i++) {
-    const i1 = i + 1;
-
-    getInputElement(alliance, `AutoTowerStatuses${i1}`, result.score.AutoTowerStatuses[i]).prop("checked", true);
-    getInputElement(alliance, `EndgameTowerStatuses${i1}`, result.score.EndgameTowerStatuses[i]).prop("checked", true);
-  }
-
-  renderFouls(alliance);
-  renderCards(alliance);
-};
-
-// Converts the current form values back into JSON structures and caches them.
-const updateResults = function (alliance) {
-  const result = allianceResults[alliance];
-  const formData = {};
-  $.each($("form").serializeArray(), function (k, v) {
-    formData[v.name] = v.value;
-  });
-
-  result.score.AutoTowerStatuses = [];
-  result.score.Hub = {
-    WonAuto: formData[`${alliance}HubWonAuto`] === "on",
-    ShiftCounts: [],
-  };
-  result.score.EndgameTowerStatuses = [];
-  for (let i = 0; i < NUM_HUB_SHIFTS; i++) {
-    result.score.Hub.ShiftCounts[i] = parseFormInt(formData[`${alliance}HubShiftCount${i}`]);
-  }
-  for (let i = 0; i < NUM_ROBOTS; i++) {
-    const i1 = i + 1;
-
-    result.score.AutoTowerStatuses[i] = parseFormInt(formData[`${alliance}AutoTowerStatuses${i1}`]);
-    result.score.EndgameTowerStatuses[i] = parseFormInt(formData[`${alliance}EndgameTowerStatuses${i1}`]);
-  }
-
-  result.score.Fouls = [];
-  for (let i = 0; formData[`${alliance}Foul${i}Index`]; i++) {
-    const prefix = `${alliance}Foul${i}`;
-    result.score.Fouls.push({
-      IsMajor: formData[`${prefix}IsMajor`] === "on",
-      TeamId: parseFormInt(formData[`${prefix}Team`]),
-      RuleId: parseFormInt(formData[`${prefix}RuleId`]),
-    });
-  }
-
-  result.cards = {};
-  $.each(result.teams, function (i, team) {
-    result.cards[team] = formData[`${alliance}Team${team}Card`];
-  });
-};
-
-const updateAllResults = function () {
   updateResults("red");
   updateResults("blue");
 
@@ -106,143 +14,158 @@ const updateAllResults = function () {
   matchResult.BlueScore = allianceResults["blue"].score;
   matchResult.RedCards = allianceResults["red"].cards;
   matchResult.BlueCards = allianceResults["blue"].cards;
+  const matchResultJson = JSON.stringify(matchResult);
+
+  // 注入隱藏輸入項
+  $("<input />").attr("type", "hidden").attr("name", "matchResultJson").attr("value", matchResultJson).appendTo("form");
+
+  return true;
+});
+
+// 渲染特定聯盟的結果到頁面
+const renderResults = function (alliance) {
+  const result = allianceResults[alliance];
+  const scoreContent = scoreTemplate(result);
+  $(`#${alliance}Score`).html(scoreContent);
+
+  // 1. Fuel 數量 (Auto/Teleop/Shifts)
+  getInputElement(alliance, "AutoFuelCount").val(result.score.AutoFuelCount || 0);
+  getInputElement(alliance, "TeleopFuelCount").val(result.score.TeleopFuelCount || 0);
+  getInputElement(alliance, "Shift1FuelCount").val(result.score.Shift1FuelCount || 0);
+  getInputElement(alliance, "Shift2FuelCount").val(result.score.Shift2FuelCount || 0);
+  getInputElement(alliance, "Shift3FuelCount").val(result.score.Shift3FuelCount || 0);
+  getInputElement(alliance, "Shift4FuelCount").val(result.score.Shift4FuelCount || 0);
+  getInputElement(alliance, "TransitionFuelCount").val(result.score.TransitionFuelCount || 0);
+  getInputElement(alliance, "EndgameFuelCount").val(result.score.EndgameFuelCount || 0);
+
+  // 2. 處理 3 個隊伍的狀態
+  // 注意：result.score 陣列索引為 0, 1, 2；但 HTML 欄位名稱使用 1, 2, 3 (對應 Payload)
+  for (let i = 0; i < 3; i++) {
+    const htmlIdx = i + 1; 
+
+    // A. 機器人是否被 Bypassed
+    if (result.score.RobotsBypassed) {
+      getInputElement(alliance, `RobotsBypassed${htmlIdx}`).prop("checked", result.score.RobotsBypassed[i]);
+    }
+
+    // B. Autonomous Tower Level 1
+    if (result.score.AutoTowerLevel1) {
+      getInputElement(alliance, `AutoTowerLevel1${htmlIdx}`).prop("checked", result.score.AutoTowerLevel1[i]);
+    }
+
+    // C. Endgame Status (支援含 alliance 或不含 alliance 的欄位名)
+    if (result.score.EndgameStatuses) {
+      let el = getInputElement(alliance, `EndgameStatuses${htmlIdx}`, result.score.EndgameStatuses[i]);
+      if (el.length === 0) { // 兼容 Payload 顯示的 EndgameStatuses1 (無 alliance 前綴)
+         $(`input[name=EndgameStatuses${htmlIdx}][value=${result.score.EndgameStatuses[i]}]`).prop("checked", true);
+      } else {
+         el.prop("checked", true);
+      }
+    }
+  }
+
+  // 3. 犯規列表
+  if (result.score.Fouls != null) {
+    $.each(result.score.Fouls, function (k, v) {
+      getInputElement(alliance, `Foul${k}IsMajor`).prop("checked", v.IsMajor);
+      getInputElement(alliance, `Foul${k}Team`, v.TeamId).prop("checked", true);
+      getSelectElement(alliance, `Foul${k}RuleId`).val(v.RuleId);
+    });
+  }
+
+  // 4. 卡片 (Cards)
+  if (result.cards != null) {
+    $.each([result.team1, result.team2, result.team3], function (i, team) {
+      getInputElement(alliance, `Team${team}Card`, result.cards[team]).prop("checked", true);
+    });
+  }
 };
 
-// Appends a blank foul to the end of the list.
+// 從表單更新緩存的 JSON 資料結構
+const updateResults = function (alliance) {
+  const result = allianceResults[alliance];
+  const formData = {};
+  $.each($("form").serializeArray(), function (k, v) {
+    formData[v.name] = v.value;
+  });
+
+  // 初始化陣列結構 (Go 端預期長度 3)
+  result.score.RobotsBypassed = [false, false, false];
+  result.score.AutoTowerLevel1 = [false, false, false];
+  result.score.EndgameStatuses = [0, 0, 0];
+
+  // 讀取 Fuel Count
+  result.score.AutoFuelCount = parseInt(formData[`${alliance}AutoFuelCount`]) || 0;
+  result.score.TeleopFuelCount = parseInt(formData[`${alliance}TeleopFuelCount`]) || 0;
+  result.score.Shift1FuelCount = parseInt(formData[`${alliance}Shift1FuelCount`]) || 0;
+  result.score.Shift2FuelCount = parseInt(formData[`${alliance}Shift2FuelCount`]) || 0;
+  result.score.Shift3FuelCount = parseInt(formData[`${alliance}Shift3FuelCount`]) || 0;
+  result.score.Shift4FuelCount = parseInt(formData[`${alliance}Shift4FuelCount`]) || 0;
+  result.score.TransitionFuelCount = parseInt(formData[`${alliance}TransitionFuelCount`]) || 0;
+  result.score.EndgameFuelCount = parseInt(formData[`${alliance}EndgameFuelCount`]) || 0;
+
+  for (let i = 0; i < 3; i++) {
+    const htmlIdx = i + 1; // 根據 Payload，HTML 名稱為 redRobotsBypassed1...3
+    
+    // 抓取 Bypassed
+    result.score.RobotsBypassed[i] = formData[`${alliance}RobotsBypassed${htmlIdx}`] === "on";
+    
+    // 抓取 AutoTower
+    result.score.AutoTowerLevel1[i] = formData[`${alliance}AutoTowerLevel1${htmlIdx}`] === "on";
+    
+    // 抓取 Endgame (優先抓取帶聯盟前綴的，若無則抓取不帶前綴的)
+    let endgameVal = formData[`${alliance}EndgameStatuses${htmlIdx}`] || formData[`EndgameStatuses${htmlIdx}`];
+    result.score.EndgameStatuses[i] = parseInt(endgameVal) || 0;
+  }
+
+  // 處理犯規
+  result.score.Fouls = [];
+  for (let i = 0; formData[`${alliance}Foul${i}Index`]; i++) {
+    const prefix = `${alliance}Foul${i}`;
+    result.score.Fouls.push({
+      IsMajor: formData[`${prefix}IsMajor`] === "on",
+      TeamId: parseInt(formData[`${prefix}Team`]) || 0,
+      RuleId: parseInt(formData[`${prefix}RuleId`]) || 0,
+    });
+  }
+
+  // 處理卡片
+  result.cards = {};
+  $.each([result.team1, result.team2, result.team3], function (i, team) {
+    result.cards[team] = formData[`${alliance}Team${team}Card`] || "";
+  });
+};
+
 const addFoul = function (alliance) {
   updateResults(alliance);
   allianceResults[alliance].score.Fouls.push({IsMajor: false, TeamId: 0, RuleId: 0});
-  renderFouls(alliance);
-  refreshScoreSummaries();
+  renderResults(alliance);
 };
 
-// Removes the given foul from the list.
 const deleteFoul = function (alliance, index) {
   updateResults(alliance);
   allianceResults[alliance].score.Fouls.splice(index, 1);
-  renderFouls(alliance);
-  refreshScoreSummaries();
+  renderResults(alliance);
 };
 
-const renderFouls = function (alliance) {
-  const result = allianceResults[alliance];
-  const foulContainer = $(`#${alliance}Fouls`);
-  foulContainer.empty();
-
-  $.each(result.score.Fouls, function (index, foul) {
-    foulContainer.append(buildFoulElement(alliance, index, foul));
-  });
-};
-
-const buildFoulElement = function (alliance, index, foul) {
-  const result = allianceResults[alliance];
-  const prefix = `${alliance}Foul${index}`;
-  const element = cloneTemplateElement("foulTemplate").addClass(`bg-dark-${alliance}`);
-
-  element.find("[data-foul-field=index]").attr("name", `${prefix}Index`).val(index);
-  element.find("[data-foul-action=delete]").on("click", function () {
-    deleteFoul(alliance, index);
-  });
-  element.find("[data-foul-field=isMajor]").attr("name", `${prefix}IsMajor`).prop("checked", foul.IsMajor);
-  element.find("[data-foul-field=ruleId]").attr("name", `${prefix}RuleId`).val(foul.RuleId);
-
-  const teamContainer = element.find("[data-foul-teams]");
-  $.each(result.teams, function (i, team) {
-    const teamOption = cloneTemplateElement("foulTeamOptionTemplate");
-    teamOption.find("[data-foul-field=team]").attr("name", `${prefix}Team`).attr("value", team).prop(
-      "checked", team === foul.TeamId
-    );
-    teamOption.find("[data-foul-team-label]").text(`Team ${team}`);
-    teamContainer.append(teamOption);
-  });
-
-  return element;
-};
-
-const renderCards = function (alliance) {
-  const result = allianceResults[alliance];
-  $.each(result.cards, function (team, card) {
-    getInputElement(alliance, `Team${team}Card`, card).prop("checked", true);
-  });
-};
-
-const scheduleScoreSummaryRefresh = function () {
-  window.clearTimeout(summaryRefreshTimer);
-  summaryRefreshTimer = window.setTimeout(refreshScoreSummaries, SUMMARY_REFRESH_DELAY_MS);
-};
-
-const refreshScoreSummaries = function () {
-  updateAllResults();
-  const requestId = ++latestSummaryRequestId;
-
-  $.ajax({
-    url: `/match_review/${matchId}/summary`,
-    method: "POST",
-    contentType: "application/json",
-    data: JSON.stringify(matchResult),
-    success: function (data) {
-      if (requestId !== latestSummaryRequestId) {
-        return;
-      }
-      updateSummaryCard("red", data.RedSummary);
-      updateSummaryCard("blue", data.BlueSummary);
-    },
-  });
-};
-
-const updateSummaryCard = function (alliance, summary) {
-  const summaryCard = $(`#${alliance}Summary`);
-  $.each(summary, function (field, value) {
-    summaryCard.find(`[data-summary-field=${field}]`).html(formatSummaryValue(field, value));
-  });
-};
-
-// Returns the form input element having the given parameters.
 const getInputElement = function (alliance, name, value) {
   let selector = `input[name=${alliance}${name}]`;
-  if (value !== undefined) {
-    selector += `[value=${value}]`;
-  }
+  if (value !== undefined) selector += `[value=${value}]`;
   return $(selector);
 };
 
-const normalizeScore = function (score) {
-  score = score || {};
-  score.AutoTowerStatuses = normalizeArray(score.AutoTowerStatuses, NUM_ROBOTS, 0);
-  score.EndgameTowerStatuses = normalizeArray(score.EndgameTowerStatuses, NUM_ROBOTS, 0);
-  score.Hub = score.Hub || {};
-  score.Hub.WonAuto = !!score.Hub.WonAuto;
-  score.Hub.ShiftCounts = normalizeArray(score.Hub.ShiftCounts, NUM_HUB_SHIFTS, 0);
-  score.Fouls = score.Fouls || [];
-  return score;
+const getSelectElement = function (alliance, name) {
+  return $(`select[name=${alliance}${name}]`);
 };
 
-const normalizeArray = function (array, length, defaultValue) {
-  array = array || [];
-  for (let i = 0; i < length; i++) {
-    if (array[i] === undefined || array[i] === null) {
-      array[i] = defaultValue;
-    }
-  }
-  return array;
-};
-
-const cloneTemplateElement = function (id) {
-  return $($(`#${id}`).prop("content").firstElementChild.cloneNode(true));
-};
-
-const formatSummaryValue = function (field, value) {
-  if (RANKING_POINT_SUMMARY_FIELDS.includes(field)) {
-    return value ? '<span class="score-summary-rp text-success">&#x2611;</span>' :
-      '<span class="score-summary-rp text-danger">&#x2612;</span>';
-  }
-  return value;
-};
-
-const parseFormInt = function (value) {
-  const parsed = parseInt(value, 10);
-  if (isNaN(parsed)) {
-    return 0;
-  }
-  return parsed;
-};
+// 自動加總各 Shift 的燃料球數量到 Teleop 欄位
+$(document).on("input", ".shift-fuel", function() {
+  const alliance = $(this).data("alliance");
+  const s1 = parseInt(getInputElement(alliance, "Shift1FuelCount").val()) || 0;
+  const s2 = parseInt(getInputElement(alliance, "Shift2FuelCount").val()) || 0;
+  const s3 = parseInt(getInputElement(alliance, "Shift3FuelCount").val()) || 0;
+  const s4 = parseInt(getInputElement(alliance, "Shift4FuelCount").val()) || 0;
+  const tr = parseInt(getInputElement(alliance, "TransitionFuelCount").val()) || 0;
+  const eg = parseInt(getInputElement(alliance, "EndgameFuelCount").val()) || 0;
+  getInputElement(alliance, "TeleopFuelCount").val(s1 + s2 + s3 + s4 + tr + eg);
+});

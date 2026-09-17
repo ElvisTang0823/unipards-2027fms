@@ -1,0 +1,90 @@
+{{define "audience_bracket"}}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Playoff bracket">
+  <defs>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#604b2c" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <style>
+    .connector{fill:none;stroke:#171717;stroke-width:3;stroke-linejoin:miter}
+    .card{filter:url(#cardShadow)}
+    .header{fill:#fff}
+    .active .header{fill:#fff000}
+    .red-row{fill:#f51f2a}
+    .blue-row{fill:#087cbb}
+    .title{font:500 22px Arial,sans-serif;fill:#171717;text-anchor:middle}
+    .entry{font:600 19px Arial,sans-serif;fill:#fff}
+    .final-label{font:500 28px Arial,sans-serif;fill:#171717;text-anchor:middle}
+    .trophy{font:58px Arial,sans-serif;fill:#20262a;text-anchor:middle}
+  </style>
+
+  <g id="official-connectors">
+    <polyline class="connector" points="244,123 268,123 268,207 305,207"/>
+    <polyline class="connector" points="244,257 268,257 268,207"/>
+    <polyline class="connector" points="244,403 268,403 268,491 305,491"/>
+    <polyline class="connector" points="244,535 268,535 268,491"/>
+    <polyline class="connector" points="505,207 530,207 530,343 830,343"/>
+    <polyline class="connector" points="505,491 530,491 530,343"/>
+
+    <polyline class="connector" points="505,699 530,699 530,636 570,636"/>
+    <polyline class="connector" points="505,830 530,830 530,769 570,769"/>
+    <polyline class="connector" points="770,636 795,636 795,703 830,703"/>
+    <polyline class="connector" points="770,769 795,769 795,703"/>
+    <polyline class="connector" points="1030,343 1060,343 1060,647 1094,647"/>
+    <polyline class="connector" points="1030,703 1060,703 1060,647"/>
+    <polyline class="connector" points="1294,647 1320,647 1320,426 1356,426"/>
+    <polyline class="connector" points="1030,343 1320,343 1320,426"/>
+
+  </g>
+
+  <g id="official-matches">
+    {{with index .Matchups "M1"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 1" "X" 44 "Y" 70)}}{{end}}
+    {{with index .Matchups "M2"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 2" "X" 44 "Y" 204)}}{{end}}
+    {{with index .Matchups "M3"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 3" "X" 44 "Y" 350)}}{{end}}
+    {{with index .Matchups "M4"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 4" "X" 44 "Y" 482)}}{{end}}
+
+    {{with index .Matchups "M7"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 7" "X" 305 "Y" 134)}}{{end}}
+    {{with index .Matchups "M8"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 8" "X" 305 "Y" 418)}}{{end}}
+    {{with index .Matchups "M5"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 5" "X" 305 "Y" 626)}}{{end}}
+    {{with index .Matchups "M6"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 6" "X" 305 "Y" 757)}}{{end}}
+
+    {{with index .Matchups "M10"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 10" "X" 570 "Y" 563)}}{{end}}
+    {{with index .Matchups "M9"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 9" "X" 570 "Y" 696)}}{{end}}
+    {{with index .Matchups "M11"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 11" "X" 830 "Y" 270)}}{{end}}
+    {{with index .Matchups "M12"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 12" "X" 830 "Y" 630)}}{{end}}
+    {{with index .Matchups "M13"}}{{template "audience_match" (dict "Matchup" . "Title" "Match 13" "X" 1094 "Y" 574)}}{{end}}
+    {{with index .Matchups "F"}}{{template "audience_final" (dict "Matchup" . "X" 1356 "Y" 352)}}{{end}}
+  </g>
+</svg>
+{{end}}
+
+{{define "audience_match"}}
+<g id="match_{{.Matchup.Id}}" class="card {{if .Matchup.IsActive}}active{{end}}" transform="translate({{.X}} {{.Y}})">
+  <rect class="header" width="200" height="36"/>
+  <rect class="red-row" y="36" width="200" height="37"/>
+  <rect class="blue-row" y="73" width="200" height="37"/>
+  <text class="title" x="100" y="25">{{.Title}}</text>
+  <text class="entry" x="10" y="62">
+    {{if .Matchup.RedAlliance}}Alliance {{.Matchup.RedAlliance.Id}}{{else}}{{toUpper .Matchup.RedAllianceSource}}{{end}}
+  </text>
+  <text class="entry" x="10" y="99">
+    {{if .Matchup.BlueAlliance}}Alliance {{.Matchup.BlueAlliance.Id}}{{else}}{{toUpper .Matchup.BlueAllianceSource}}{{end}}
+  </text>
+</g>
+{{end}}
+
+{{define "audience_final"}}
+<g id="match_{{.Matchup.Id}}" class="card {{if .Matchup.IsActive}}active{{end}}" transform="translate({{.X}} {{.Y}})">
+  <rect class="header" width="200" height="188"/>
+  <rect class="red-row" y="188" width="200" height="37"/>
+  <rect class="blue-row" y="225" width="200" height="37"/>
+  <text class="trophy" x="100" y="76">🏆</text>
+  <text class="final-label" x="100" y="132">FINALS</text>
+  <text class="entry" x="10" y="214">
+    {{if .Matchup.RedAlliance}}Alliance {{.Matchup.RedAlliance.Id}}{{else}}{{toUpper .Matchup.RedAllianceSource}}{{end}}
+  </text>
+  <text class="entry" x="10" y="251">
+    {{if .Matchup.BlueAlliance}}Alliance {{.Matchup.BlueAlliance.Id}}{{else}}{{toUpper .Matchup.BlueAllianceSource}}{{end}}
+  </text>
+</g>
+{{end}}

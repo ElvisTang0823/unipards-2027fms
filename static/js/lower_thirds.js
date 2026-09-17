@@ -32,6 +32,16 @@ var hideLowerThird = function (button) {
   websocket.send("hideLowerThird", constructLowerThird(button));
 };
 
+// Sends a websocket message to reveal the team info row on top of the already-shown lower third.
+var revealLowerThirdTeam = function (button) {
+  websocket.send("revealLowerThirdTeam", constructLowerThird(button));
+};
+
+// Sends a websocket message to hide just the team info row, keeping the award name showing.
+var hideLowerThirdTeam = function (button) {
+  websocket.send("hideLowerThirdTeam", constructLowerThird(button));
+};
+
 // Sends a websocket message to reorder the given the lower third.
 var reorderLowerThird = function (button, moveUp) {
   websocket.send("reorderLowerThird", {Id: parseInt(button.form.id.value), MoveUp: moveUp})

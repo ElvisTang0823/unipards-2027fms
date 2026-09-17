@@ -3,10 +3,356 @@
   Author: pat@patfairbank.com (Patrick Fairbank)
 */
 
-@import url("/static/css/display_overlay_shared.css");
-
-#overlayCentering {
+html {
+  cursor: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  overflow: hidden;
+}
+/*Match play 顯示 */
+#overlayCentering { 
+  position:fixed;
   bottom: -210px;
+  width: 100%;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+#matchOverlayContainer {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+#matchOverlay {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  /*border: 1px solid #222;*/
+  color: #222;
+  font-size: 50px;
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
+}
+.Dive {
+  height: 100%;
+  margin: 0 0px;
+  background-color: #ffff;
+}
+.Reescape {
+  height: 100%;
+  margin: 0 0px;
+  background-color: #ffff;
+}
+#matchOverlayTop {
+  height: 100%;
+  bottom: 0;
+  display: flex;
+}
+.playoff-alliance {
+  position: relative;
+  top: 31px;
+  width: 100px;
+  height: 40px;
+  padding: 0 0px;
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  background-color: #fc0;
+  color: #222;
+  border: 1px solid #222;
+  font-size: 30px;
+  font-weight: 200;
+}
+#leftPlayoffAlliance {
+  left: 23px;
+  justify-content: start;
+  border-right: none;
+}
+#rightPlayoffAlliance {
+  right: 23px;
+  justify-content: end;
+
+  border-left: none;
+}
+
+.Wrapper {
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  align-items: center;
+  width: 38vw; /* 或指定寬度 */
+
+}
+#leftWrapper{
+  left: 0;
+}
+#rightWrapper{
+  right: 0;
+}
+/* 動畫後的隊伍號碼*/
+.teams {
+  width: 100%;
+  height: 32%;
+  display: none;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: #fff;
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
+  font-size: 25px;
+  line-height: 25px;
+  border: 1px solid #000;
+
+}
+
+.teams div[data-yellow-card=true] {
+  width: 90%;
+  height: 32%;
+  border-radius: 0.2vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fc0;
+}
+.team {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+#leftTeams {
+  border-right: 1px solid #222;
+
+}
+#rightTeams {
+  border-left: 1px solid #222;
+
+}
+.reversible-left[data-reversed=true], .reversible-right[data-reversed=false] {
+  background-color: #831e12;
+}
+.reversible-left[data-reversed=false], .reversible-right[data-reversed=true] {
+  background-color: #004172;
+}
+
+.score {
+  position: relative; /* 新增這一行 */
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  width: 0vw;
+  height: 80%;
+  display: flex;
+  justify-content: space-between;
+}
+.score-right {
+  justify-content: flex-end;
+}
+
+
+/*.avatars {
+  min-width: 50px;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}*/
+.avatar {
+  height: 25px;
+}
+
+.number {
+  width:33%;
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  top: 10px;
+  /*justify-content: center; /* 垂直置中 */
+  align-items: center; /* 水平置中 */
+  gap: 15px; /* 兩行間距 */
+}
+#rednumber{
+  background-color: #ed1c24;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+#bluenumber{
+  
+    background-color:#2080ff;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+
+}
+.number-score{
+  display: flex;
+  width: 30vw;
+  height: 125px;
+  flex-direction: row;
+  justify-content: space-between;
+  border: 1px solid #000;
+  background-color: #ffff;
+}
+.number span {
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;
+  font-size: 25px; /* 你可以調整大小 */
+  color: #fff;
+}
+.score-number {
+  width: 120px;
+  height: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
+  font-size: 60px;
+  color: #fff;
+  opacity: 0;
+}
+.score-right .score-left {
+  align-items: flex-end;
+
+}
+.score-fields {
+  display: none; /* JS 會改為 flex */
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center; /* 改為 center，確保所有圖標在同一水平線上 */
+  position: absolute; /* 從 fixed 改為 absolute */
+  bottom: 15px;
+  height: 60px; /* 給予固定高度，不要用 5%，避免內容撐開不一 */
+}
+.score-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* 確保圖標跟數字對齊 */
+  justify-content: center;
+}
+
+.coral-icon {
+  width: 40px;
+  margin: 0 12px;
+}
+.algae-icon {
+  width: 35px;
+  margin: 0 14px;
+}
+/* 新增：包裹容器樣式 */
+.shift-info-wrapper {
+  position: absolute;
+  top: 0px; /* 固定在圓盤上方 */
+  width: 100%;
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center;     /* 垂直對齊 */
+  gap: 5px;                /* 數字與秒數間的微小間距 */
+}
+
+/* 調整 Shift 數字與秒數的字體 */
+#shiftCounter, #shiftTime {
+  font-family: 'Arboto Bold', sans-serif;
+  font-size: 26px; /* 稍微縮小字體以利並排 */
+  font-weight: 700;
+  color: #222;
+  white-space: nowrap; /* 避免換行 */
+}
+
+#coopetition{
+  width: 31px;
+  display: flex;
+  top: 0px;
+  margin: 0 14px;
+}
+.score-field>div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
+  font-size: 27px;
+  line-height: 27px;
+  color: #fff;
+}
+#matchCircle {
+  position: absolute;
+  top: 70px;
+  /*border-radius: 50%; 改成方形*/
+  width: 180px;
+  height: 125px;
+  /*background-color: #fff;
+  border: 1px solid #222;*/
+}
+#logo {
+  position: relative;
+  top: 35px;
+  height: 50px;
+}
+#matchTime {
+  position: absolute;
+  bottom: 0px; /* 固定在容器底部 */
+  left: 0;
+  right: 0;
+  height: 30px;
+  color: #222;
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;
+  font-size: 50px;
+  text-align: center;
+  opacity: 0;
+}
+#eventMatchInfo {
+  height: 0;
+  display: none;
+  justify-content: space-between;
+  z-index: -1;
+  align-items: flex-end;
+  padding: 0 0px;
+  background-color: #444;
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
+  font-size: 20px;
+  line-height: 30px;
+  color: #fff;
+}
+#playoffSeriesStatus {
+  width: 40px;
+  height: 18px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: #fc0;
+  color: #222;
+  border: 1px solid #222;
+  border-top: none;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  font-size: 15px;
+  font-weight: 200;
+}
+#timeoutDetails {
+  position: absolute;
+  bottom: 95px;
+  width: 140px;
+  height: 50px;
+  z-index: -1;
+  padding: 0 20px;
+  display: none;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  color: #222;
+  border: 1px solid #222;
+}
+#timeoutBreakDescription {
+  font-weight: bold;
+  font-size: 20px;
+  opacity: 0;
+}
+#timeoutNextMatch {
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  opacity: 0;
 }
 #blindsContainer {
   position: fixed;
@@ -36,8 +382,11 @@
   background-position: center;
   background-size: 100%;
 }
-.blinds.background {
-  background-image: url("/static/img/endofmatch-bg.png");
+body[data-reversed="true"] .blinds.background {
+  background-image: url("/static/img/background_true.jpeg");
+}
+body[data-reversed="false"] .blinds.background {
+  background-image: url("/static/img/background_false.jpeg");
 }
 .blindsCenter {
   position: absolute;
@@ -75,6 +424,8 @@
   top: 55px;
   height: 220px;
 }
+
+/*final 分數畫面*/
 #finalScoreCentering {
   position: fixed;
   width: 100%;
@@ -84,67 +435,11 @@
   align-items: center;
 }
 #finalScore {
-  position: relative;
-  width: 1000px;
+  width: 1200px;
   display: flex;
   flex-direction: column;
   border: 2px solid #333;
   opacity: 0;
-}
-#finalResultIndicators {
-  position: absolute;
-  top: -63px;
-  left: 0;
-  right: 0;
-  height: 63px;
-  display: flex;
-  pointer-events: none;
-}
-.final-result-indicator-slot {
-  width: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
-.final-result-indicator-slot:first-child {
-  padding-right: 150px;
-}
-.final-result-indicator-slot:last-child {
-  padding-left: 150px;
-}
-.final-result-indicator, #finalTiebreakReason {
-  min-width: 270px;
-  height: 63px;
-  padding: 0 36px;
-  border: 2px solid #333;
-  border-radius: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  background-color: #fc3;
-  color: #222;
-  font-family: "FuturaLTBold";
-  font-size: 36px;
-  line-height: 63px;
-  text-align: center;
-}
-#finalTiebreakReason {
-  position: absolute;
-  bottom: -63px;
-  left: 0;
-  right: 0;
-  width: fit-content;
-  margin: 0 auto;
-  pointer-events: none;
-}
-.final-result-indicator[data-result=tie] {
-  background-color: #999;
-}
-.final-result-indicator[data-result=winner], .final-result-indicator[data-result=tie] {
-  display: flex;
-}
-#finalTiebreakReason[data-visible=true] {
-  display: flex;
 }
 .final-score-row {
   display: flex;
@@ -156,11 +451,40 @@
   line-height: 200px;
   border-bottom: 2px solid #333;
   color: #fff;
-  font-family: "FuturaLTBold";
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
   font-size: 100px;
   text-align: center;
   text-shadow: 0 0 3px #333;
 }
+
+
+#winVideoPlayer{
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 9999;
+  background:transparent;
+}
+/* Keep the Final Score colors synchronized with the display's reversed setting. */
+.final-score.reversible-left[data-reversed=true],
+.final-teams.reversible-left[data-reversed=true],
+.final-score.reversible-right[data-reversed=false],
+.final-teams.reversible-right[data-reversed=false] {
+  background-color: red;
+}
+
+.final-score.reversible-left[data-reversed=false],
+.final-teams.reversible-left[data-reversed=false],
+.final-score.reversible-right[data-reversed=true],
+.final-teams.reversible-right[data-reversed=true] {
+  background-color: #2080ff;
+}
+.final-teams { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
 #leftFinalScore {
   padding-right: 150px;
 }
@@ -168,14 +492,15 @@
   padding-left: 150px;
 }
 .final-breakdown {
-  height: 380px;
+  height: 360px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background-color: #fff;
   color: #222;
-  font-family: "FuturaLT";
-  font-size: 24px;
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
+  font-size: 30px;
 }
 #leftFinalBreakdown {
   width: 60px;
@@ -228,7 +553,8 @@
 .final-team-number {
   width: 85px;
   color: #fff;
-  font-family: "FuturaLT";
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
   font-size: 32px;
   line-height: 43px;
   text-align: center;
@@ -270,6 +596,14 @@
   color: #fff;
   font-size: 20px;
 }
+
+
+.final-rank-point{
+  display: flex;
+  flex-direction: row;
+}
+
+
 .final-destination {
   margin-top: 10px;
   width: 200px;
@@ -293,7 +627,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 25px;
-  font-family: "FuturaLT";
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
   font-size: 28px;
   background-color: #444;
   color: #fff;
@@ -312,24 +647,240 @@
 #finalMatchName {
   text-align: right;
 }
+
+/* Official-style Audience Display playoff bracket. */
 #bracket {
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto auto;
+  inset: 0;
+  overflow: hidden;
   z-index: 1;
   opacity: 0;
-  text-align: center;
+  background-color: #f7e7c4;
+  background-image: url("/static/img/alliance_selection_background.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #1f1f1f;
+  font-family: "Outfit", "FuturaLT", sans-serif;
 }
+
+.audience-bracket-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(28px);
+  transition: opacity 650ms ease, transform 650ms ease, visibility 650ms;
+  pointer-events: none;
+}
+
+.audience-bracket-slide.is-active {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.audience-bracket-rounds {
+  position: absolute;
+  top: 10px;
+  left: 5%;
+  right: 10%;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  pointer-events: none;
+}
+
+.audience-bracket-rounds span {
+  font-size: clamp(22px, 2vw, 38px);
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.audience-bracket-tree {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
 #bracketSvg {
-  width: 1920px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  max-width: none;
+  height: auto;
+  clip-path: none;
+  filter: drop-shadow(0 5px 6px rgba(62, 43, 20, 0.16));
+}
+
+.audience-bracket-footer {
+  position: absolute;
+  right: 1.2%;
+  bottom: 18px;
+  z-index: 4;
+  width: min(44vw, 850px);
+  height: 88px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(220px, 1fr);
+  box-shadow: 0 5px 13px rgba(55, 39, 17, 0.26);
+}
+
+.audience-bracket-footer-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  background: #edb52d;
+  color: #171717;
+  font-size: clamp(18px, 1.45vw, 28px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.audience-bracket-footer-sponsor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 22px;
+  background: #fff;
+}
+
+.audience-bracket-footer-sponsor img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bracket-alliance-grid {
+  position: absolute;
+  top: 3.2%;
+  left: 14.5%;
+  right: 14.5%;
+  bottom: 26%;
+  display: grid;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.bracket-alliance-row {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 33% 67%;
+  box-shadow: 0 4px 10px rgba(55, 39, 17, 0.18);
+}
+
+.bracket-alliance-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #edb52d;
+  color: #171717;
+  font-size: clamp(22px, 2.2vw, 43px);
+  font-weight: 500;
+}
+
+.bracket-alliance-teams {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #dedede;
+}
+
+.bracket-alliance-team {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  color: #242424;
+  font-size: clamp(16px, 1.45vw, 28px);
+  font-weight: 700;
+}
+
+.bracket-alliance-team img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.bracket-alliance-team-empty span {
+  display: none;
+}
+
+.bracket-alliance-team-empty img {
+  opacity: 0.9;
+}
+
+.bracket-alliance-footer {
+  position: absolute;
+  right: 5%;
+  bottom: 2.2%;
+  left: 5%;
+  height: 16%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 29%;
+  background: #fff;
+  box-shadow: 0 5px 13px rgba(55, 39, 17, 0.23);
+}
+
+.bracket-alliance-event {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 5%;
+  color: #202020;
+}
+
+.bracket-alliance-event::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 27%;
+  z-index: 0;
+  background: #edb52d;
+}
+
+.bracket-alliance-event strong,
+.bracket-alliance-event span {
+  position: relative;
+  z-index: 1;
+}
+
+.bracket-alliance-event strong {
+  font-size: clamp(22px, 2.1vw, 40px);
+}
+
+.bracket-alliance-event span {
+  font-size: clamp(17px, 1.35vw, 26px);
+}
+
+.bracket-alliance-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 28px;
+}
+
+.bracket-alliance-brand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 #sponsor {
   position: fixed;
-  width: 1000px;
-  height: 600px;
+  width: 1280px;
+  height: 780px;
   top: 0;
   bottom: 0;
   left: 0;
@@ -345,13 +896,14 @@
   height: 100%;
 }
 .sponsor-image-container {
-  width: 1000px;
-  height: 500px;
+  width: 1080px;
+  height: 720px;
   display: table-cell;
   vertical-align: middle;
 }
 #sponsor h1, #sponsor h2 {
-  font-family: "FuturaLTBold";
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
   margin: 0;
 }
 #sponsor h1 {
@@ -371,70 +923,213 @@
   line-height: 110px;
 }
 #sponsor img {
-  max-width: 800px;
-  max-height: 400px;
+  max-width: 1280px;
+  max-height: 800px;
+  top:0px;
+}
+#allianceSelectionBackground {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.alliance-selection-bg-piece {
+  position: absolute;
+  background-image: url("/static/img/alliance_selection_background.png");
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh;
+}
+.alliance-selection-bg-top {
+  inset: 0 0 auto 0;
+  height: 4vh;
+  background-position: 0 0;
+}
+.alliance-selection-bg-left {
+  left: 0;
+  top: 4vh;
+  width: 7vw;
+  height: 41vh;
+  background-position: 0 -4vh;
+}
+.alliance-selection-bg-right {
+  right: 0;
+  top: 4vh;
+  width: 52vw;
+  height: 41vh;
+  background-position: -48vw -4vh;
+}
+.alliance-selection-bg-bottom {
+  inset: 45vh 0 0 0;
+  background-position: 0 -45vh;
+}
+.alliance-selection-video-frame {
+  position: absolute;
+  left: 7vw;
+  top: 4vh;
+  width: 41vw;
+  height: 41vh;
+  border: 0.8vw solid #e8b92f;
+  box-sizing: border-box;
+  box-shadow: 0 0.4vw 1vw rgba(0, 0, 0, 0.18);
 }
 #allianceRankingsCentering {
   position: absolute;
-  height: 100%;
-  left: 3em;
-  top: 3em;
+  left: 4em;
+  bottom: 5em; /* Keep Available Teams below the green-screen frame. */
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.8em; /* Base size for unpicked grid */
+  z-index: 2;
+}
+#allianceRankingsCentering.empty-grid {
+  display: none !important;
+}
+.rankings-header-title {
+  font-weight: 800;
+  font-size: 1.3em;
+  color: #111;
+  margin-bottom: 0.5em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 #allianceRankings {
-  max-width: 11em;
-  max-height: 92%;
+  height: 10.1em; /* Fits exactly 4 rows */
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: column wrap; /* Flow vertically first */
+  align-content: flex-start;
+  gap: 0.4em;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+#allianceRankings:empty {
+  display: none !important;
+}
+.team-tile-display {
+  display: flex;
+  flex-direction: row;
+  border-radius: 6px;
   overflow: hidden;
+  border: 1px solid #ccc;
+  height: 1.5em;
   background-color: #fff;
-  border: 2px solid #222;
-  font-size: 2em;
-  font-family: "FuturaLT";
+  margin-right: 0.4em;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-.unpicked {
-  width: 5.5em;
+.team-rank-display {
+  width: 2.4em;
+  background-color: #34495e; /* Default dark grey-blue for ranks */
+  color: #fff;
+  font-size: 0.9em;
+  font-weight: 800;
   display: flex;
-  justify-content: start;
+  align-items: center;
+  justify-content: center;
 }
-.unpicked-rank {
-  width: 1.8em;
-  text-align: right;
-  color: #999;
+.captain-candidate .team-rank-display {
+  background-color: #e67e22; /* Orange for captain candidates! */
 }
-.unpicked-team {
-  margin-left: 0.3em;
-  color: #222;
+.team-body-display {
+  width: 3.5em;
+  background-color: #fff;
+  color: #2c3e50;
+  font-size: 0.95em;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid #ddd;
 }
 #allianceSelectionCentering {
   position: absolute;
-  height: 100%;
   top: 3em;
-  right: 3em;
+  right: 4em;
+  /* Naturally flows from top-right. Bottom is kept clear. */
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.8em; /* Base size matching unpicked grid */
+  z-index: 2;
 }
-#allianceSelection {
-  display: table-cell;
-  vertical-align: middle;
+.alliance-header-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6em;
+  width: 14.5em; /* Matches the exact width of the table! */
+}
+.alliance-header-title {
+  font-size: 1.3em;
+  font-weight: 800;
+  color: #111;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.alliance-timer-box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  height: 2.0em;
+}
+.alliance-timer-icon {
+  background-color: #f1c40f; /* Yellow */
+  color: #000;
+  font-size: 1.1em;
+  width: 2.0em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #ccc;
+}
+.alliance-timer-text {
+  font-size: 1.1em;
+  font-weight: 800;
+  padding: 0 0.8em;
+  color: #000;
 }
 #allianceSelectionTable {
   background-color: #fff;
-  border: 2px solid #222;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  width: 14.5em;
+}
+#allianceSelectionTable tr {
+  border-bottom: 1px solid #eee;
+}
+#allianceSelectionTable tr:last-child {
+  border-bottom: none;
+}
+.alliance-index-cell {
+  background-color: #f1c40f; /* Yellow */
+  color: #000;
+  font-size: 1.1em;
+  font-weight: 800;
+  width: 2.0em;
   text-align: center;
-  font-family: "FuturaLT";
-  font-size: 2.6em;
-}
-#allianceSelectionTable tr:nth-child(even) {
-  background-color: #ccc;
-}
-.alliance-cell {
-  padding: 0px 20px;
-  font-family: "FuturaLT";
-  color: #999;
+  padding: 0.35em 0;
+  border-right: 2px solid #ccc;
 }
 .selection-cell {
-  width: 3.1em;
-  color: #222;
+  padding: 0.35em 0.8em;
+  color: #2c3e50;
+  font-size: 1.1em;
+  font-weight: 800;
+  text-align: center;
+  border-right: 1px solid #eee;
+  width: 4em;
+  background-color: #fff;
 }
-#lowerThird {
+.selection-cell:last-child {
+  border-right: none;
+}
+/*#lowerThird {
   display: none;
   position: absolute;
   left: -1000px;
@@ -445,27 +1140,625 @@
   font-size: 30px;
   width: 800px;
   height: 87px;
+}*/
+#lowerThird {
+  position: absolute;
+  bottom: 60px;
+  left: 60px;
+  width: 1560px;
+  font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: none; /* 預設由 JS 控管顯示/隱藏 */
 }
-#lowerThirdLogo {
-  margin: 12px 20px;
+
+/* --- 上層：白色標題列 (條目一) --- */
+.lt-top-row {
+  display: flex;
   height: 60px;
-  float: left;
+  background-color: #ffffff;
+  align-items: center;
+  overflow: hidden;
 }
-#lowerThirdTop {
+
+.lt-logo-box {
+  width: 160px;
+  height: 100%;
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+}
+
+.lt-logo-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.lt-title-text {
+  flex: 1;
+  padding-left: 20px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- 下層：可開關) --- */
+.lt-bottom-row {
+  display: flex;
+  height: 80px;
+  background-color: #eab308; /* 金黃色 */
+  color: #000000;
+  border-top: 2px solid #ca8a04;
+}
+
+.lt-avatar-box {
+  width: 160px;
+  height: 100%;
+  background-color: #a5f3fc; /* 隊號淺藍色背景 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.lt-info-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 20px;
+  overflow: hidden;
+}
+
+.lt-team-name {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-meta-row {
+  display: flex;
+  gap: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 3px;
+  color: #1c1917;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Consolidated official-style Match Play layout. */
+#overlayCentering {
+  top: -160px;
+  bottom: auto;
+  height: 105px;
+  justify-content: flex-start;
+}
+
+#matchOverlayContainer {
   position: relative;
-  top: 10px;
-  display: none;
-  font-family: "FuturaLTBold";
+  width: min(1000px, calc(100vw - 40px));
+  height: 105px;
+  margin: 0 auto;
+  align-items: flex-start;
+  overflow: visible;
 }
-#lowerThirdBottom {
-  display: none;
-  font-family: "FuturaLT";
-  font-size: 23px;
-  position: relative;
-  top: 5px;
+
+#matchOverlay {
+  width: 100%;
+  height: 105px;
+  overflow: visible;
+  color: #222;
+  font-size: 34px;
+  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.35));
 }
-#lowerThirdSingle {
+
+#eventMatchInfo {
+  order: 0;
   display: none;
-  font-family: "FuturaLTBold";
-  line-height: 87px;
+  grid-template-columns: 190px minmax(0, 1fr) 190px;
+  width: 100%;
+  height: 0;
+  min-height: 0;
+  padding: 0;
+  align-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: linear-gradient(90deg, #252525, #1f1f1f, #252525);
+  color: #fff;
+  font-size: 21px;
+  line-height: 35px;
+}
+
+#eventMatchInfo #matchName {
+  text-align: center;
+}
+
+#eventMatchInfo .Dive,
+#eventMatchInfo .Reescape {
+  width: 190px;
+  height: 35px;
+  padding: 2px 10px;
+  justify-self: stretch;
+  object-fit: contain;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+#matchOverlayTop {
+  order: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr);
+  grid-template-rows: 50px;
+  width: 100%;
+  height: 50px;
+  align-items: stretch;
+  overflow: visible;
+}
+
+#leftWrapper,
+#rightWrapper {
+  display: grid;
+  width: 100%;
+  height: 50px;
+  min-width: 0;
+  overflow: visible;
+}
+
+#leftWrapper {
+  grid-column: 1;
+  grid-row: 1;
+  grid-template-columns: minmax(0, 1fr) 110px;
+}
+
+.number-score {
+  grid-column: 2;
+  grid-row: 1;
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+  height: 50px;
+  min-height: 50px;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+#rightWrapper {
+  grid-column: 3;
+  grid-row: 1;
+  grid-template-columns: 110px minmax(0, 1fr);
+}
+
+#leftTeams,
+#rightTeams {
+  grid-row: 1;
+  width: 100%;
+  height: 50px;
+  min-width: 0;
+  min-height: 50px;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+  color: #fff;
+  font-size: 21px;
+  line-height: 21px;
+}
+
+body[data-reversed="true"] #leftTeams,
+body[data-reversed="false"] #rightTeams {
+  background: #a90d18;
+}
+
+body[data-reversed="true"] #rightTeams,
+body[data-reversed="false"] #leftTeams {
+  background: #00689d;
+}
+
+#leftTeams {
+  grid-column: 1;
+}
+
+#rightTeams {
+  grid-column: 2;
+}
+
+.team {
+  min-width: 0;
+  height: 100%;
+  padding: 0 7px;
+  gap: 5px;
+  box-sizing: border-box;
+  justify-content: center;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#leftTeams .team:last-child,
+#rightTeams .team:last-child {
+  border-right: 0;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+#leftWrapper .score,
+#rightWrapper .score {
+  grid-row: 1;
+  display: flex;
+  width: 110px !important;
+  min-width: 110px;
+  max-width: 110px;
+  height: 50px;
+  min-height: 50px;
+  margin: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  box-shadow: none;
+}
+
+/* reversed=true：左紅、右藍 */
+body[data-reversed="true"] #leftWrapper .score,
+body[data-reversed="false"] #rightWrapper .score {
+  background: #ed1c24 !important;
+}
+
+/* reversed=true：右藍；reversed=false：左藍 */
+body[data-reversed="true"] #rightWrapper .score,
+body[data-reversed="false"] #leftWrapper .score {
+  background: #129bd3 !important;
+}
+
+#leftWrapper .score {
+  grid-column: 2;
+}
+
+#rightWrapper .score {
+  grid-column: 1;
+}
+
+.score .score-number {
+  display: flex;
+  width: 110px !important;
+  min-width: 110px;
+  max-width: 110px;
+  height: 50px;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 46px;
+  line-height: 1;
+  opacity: 0;
+}
+
+#number-center {
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+  height: 50px;
+  min-height: 50px;
+  background: #fff;
+}
+
+#matchCircle {
+  top: 25px;
+  width: 110px;
+  height: 50px;
+  min-height: 50px;
+  z-index: 3;
+}
+
+#matchTime {
+  position: absolute;
+  top: 70%;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  width: 110px;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  color: #222;
+  font-size: 38px;
+  line-height: 1;
+  text-align: center;
+  transform: translateY(-50%);
+}
+
+.shift-info-wrapper {
+  position: absolute;
+  top: 60px;
+  width: 110px;
+  height: 25px;
+  min-height: 25px;
+  display: none;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-top: 1px solid #d7d7d7;
+  background: #fff;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.22);
+}
+
+body[data-match-state="TELEOP_PERIOD"] .shift-info-wrapper {
+  display: flex;
+}
+
+#shiftCounter,
+#shiftTime {
+  color: #222;
+  font-size: 19px !important;
+  line-height: 25px;
+}
+
+#logo {
+  display: none;
+}
+
+.coopertition {
+  position: absolute;
+  top: 50px;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+#left_Hubactive {
+  left: auto;
+  right: calc(100% + 14px);
+}
+
+#right_Hubactive {
+  right: auto;
+  left: calc(100% + 14px);
+}
+
+.hub-active-arrow {
+  display: block;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  object-fit: contain;
+}
+
+body[data-match-state="POST_MATCH"] .coopertition {
+  visibility: hidden;
+}
+
+.external-score-fields {
+  position: absolute;
+  top: 50px;
+  width: 180px !important;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 12px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 3px;
+  color: #fff;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.3));
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+.external-score-fields-left {
+  right: calc(100% + 80px);
+}
+
+.external-score-fields-right {
+  left: calc(100% + 80px);
+}
+
+body[data-reversed="true"] .external-score-fields-left,
+body[data-reversed="false"] .external-score-fields-right {
+  background: #ed1c24;
+}
+
+body[data-reversed="false"] .external-score-fields-left,
+body[data-reversed="true"] .external-score-fields-right {
+  background: #087fbd;
+}
+
+.external-score-fields .score-field > div {
+  min-width: 95px;
+  color: #fff;
+  font-size: 22px;
+  white-space: nowrap;
+}
+
+.coral-icon {
+  width: 30px;
+  margin: 0 6px;
+}
+
+/* Official 2026 playoff scoreboard. Every rule is playoff-scoped so that the
+   existing qualification Match Intro and Match Play layout remains unchanged. */
+body[data-playoff="true"] #matchOverlayTop {
+  grid-template-rows: 70px;
+  height: 70px;
+}
+
+body[data-playoff="true"] #leftWrapper,
+body[data-playoff="true"] #rightWrapper {
+  height: 70px;
+  grid-template-rows: 40px 30px;
+}
+
+body[data-playoff="true"] #leftWrapper {
+  grid-template-columns: minmax(0, 1fr) 110px;
+}
+
+body[data-playoff="true"] #rightWrapper {
+  grid-template-columns: 110px minmax(0, 1fr);
+}
+
+body[data-playoff="true"] #leftWrapper .playoff-alliance,
+body[data-playoff="true"] #rightWrapper .playoff-alliance {
+  position: static;
+  grid-row: 1;
+  width: auto;
+  height: 40px;
+  padding: 0;
+  margin: 0;
+  z-index: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  font-size: 31px;
+  font-weight: 800;
+  line-height: 40px;
+  text-transform: uppercase;
+}
+
+body[data-playoff="true"] #leftWrapper .playoff-alliance::before,
+body[data-playoff="true"] #rightWrapper .playoff-alliance::before {
+  content: "ALLIANCE ";
+}
+
+body[data-playoff="true"] #leftWrapper .playoff-alliance {
+  grid-column: 1;
+}
+
+body[data-playoff="true"] #rightWrapper .playoff-alliance {
+  grid-column: 2;
+}
+
+body[data-playoff="true"][data-reversed="true"] #leftWrapper .playoff-alliance,
+body[data-playoff="true"][data-reversed="false"] #rightWrapper .playoff-alliance {
+  background: #ed1c24;
+}
+
+body[data-playoff="true"][data-reversed="false"] #leftWrapper .playoff-alliance,
+body[data-playoff="true"][data-reversed="true"] #rightWrapper .playoff-alliance {
+  background: #087fbd;
+}
+
+body[data-playoff="true"] #leftTeams,
+body[data-playoff="true"] #rightTeams {
+  grid-row: 2;
+  height: 30px;
+  min-height: 30px;
+  font-size: 17px;
+  line-height: 17px;
+}
+
+body[data-playoff="true"] .team {
+  height: 30px;
+  padding: 0 5px;
+  gap: 4px;
+}
+
+body[data-playoff="true"] .avatar {
+  width: 24px;
+  height: 24px;
+}
+
+body[data-playoff="true"] #leftWrapper .score,
+body[data-playoff="true"] #rightWrapper .score,
+body[data-playoff="true"] .score .score-number {
+  grid-row: 1 / 3;
+  height: 70px;
+  min-height: 70px;
+}
+
+body[data-playoff="true"] .score .score-number {
+  font-size: 48px;
+}
+
+body[data-playoff="true"] .number-score,
+body[data-playoff="true"] #number-center,
+body[data-playoff="true"] #matchCircle {
+  height: 70px;
+  min-height: 70px;
+}
+
+body[data-playoff="true"] #matchCircle {
+  top: 35px;
+}
+
+body[data-playoff="true"] #matchTime {
+  top: 50%;
+  font-size: 39px;
+}
+
+body[data-playoff="true"] .shift-info-wrapper {
+  top: 70px;
+}
+
+body[data-playoff="true"] .coopertition,
+body[data-playoff="true"] .external-score-fields {
+  top: 70px;
+}
+
+#broadcastFooter {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  width: 850px;
+  height: 74px;
+  display: none;
+  align-items: center;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: #242424;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.35);
+}
+
+.broadcast-footer-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 28px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.broadcast-footer-mark {
+  color: #fff;
+  transform: rotate(45deg);
+}
+
+.broadcast-footer-presented {
+  padding: 0 24px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.broadcast-footer-logo {
+  width: 220px;
+  height: 74px;
+  padding: 10px 18px;
+  object-fit: contain;
+  box-sizing: border-box;
+  background: #fff;
 }

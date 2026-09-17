@@ -1,0 +1,14 @@
+{
+  "name": "Red Far Scoring",
+  "icons": [
+    {
+      "src": "/static/img/panel-icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "scope": "/panels/scoring/red_far",
+  "start_url": "/panels/scoring/red_far",
+  "display": "standalone",
+  "orientation": "landscape"
+}
