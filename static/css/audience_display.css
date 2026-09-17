@@ -1360,12 +1360,22 @@ body[data-reversed="false"] .blinds.background {
 
 body[data-reversed="true"] #leftTeams,
 body[data-reversed="false"] #rightTeams {
-  background: #a90d18;
+  background: #800e13;
 }
 
 body[data-reversed="true"] #rightTeams,
 body[data-reversed="false"] #leftTeams {
-  background: #00689d;
+  background: #004173;
+}
+
+body[data-reversed="true"] #leftTeams .team:nth-child(2),
+body[data-reversed="false"] #rightTeams .team:nth-child(2) {
+  background: #5f0b0c;
+}
+
+body[data-reversed="true"] #rightTeams .team:nth-child(2),
+body[data-reversed="false"] #leftTeams .team:nth-child(2) {
+  background: #003258;
 }
 
 #leftTeams {
@@ -1377,6 +1387,7 @@ body[data-reversed="false"] #leftTeams {
 }
 
 .team {
+  flex:1;
   min-width: 0;
   height: 100%;
   padding: 0 7px;
@@ -1384,7 +1395,7 @@ body[data-reversed="false"] #leftTeams {
   box-sizing: border-box;
   justify-content: center;
   white-space: nowrap;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  /*border-right: 1px solid rgba(255, 255, 255, 0.2);*/
 }
 
 #leftTeams .team:last-child,
@@ -1393,7 +1404,7 @@ body[data-reversed="false"] #leftTeams {
 }
 
 .avatar {
-  width: 28px;
+  width: auto;
   height: 28px;
   object-fit: contain;
 }
@@ -1720,9 +1731,9 @@ body[data-playoff="true"] .external-score-fields {
 #broadcastFooter {
   position: fixed;
   left: 50%;
-  bottom: 18px;
-  width: 850px;
-  height: 74px;
+  bottom: 15px;
+  width: 500px;
+  height: 45px;
   display: none;
   align-items: center;
   transform: translateX(-50%);
@@ -1735,12 +1746,12 @@ body[data-playoff="true"] .external-score-fields {
 
 .broadcast-footer-title {
   flex: 1;
-  display: flex;
+  text-align: center;
   align-items: center;
   gap: 16px;
   padding: 0 28px;
-  font-size: 30px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 500;
 }
 
 .broadcast-footer-mark {

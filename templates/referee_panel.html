@@ -1,15 +1,15 @@
 {{/*
-Copyright 2026 Team 254. All Rights Reserved.
-Modified for 2026 REBUILT Game
+Copyright 2023 Team 254. All Rights Reserved.
+Author: pat@patfairbank.com (Patrick Fairbank)
+
+UI for entering and tracking fouls and red/yellow cards.
 */}}
-
 {{define "title"}}Referee Panel{{end}}
-
 {{define "body"}}
 <div id="matchName"></div>
 <div id="refereePanel">
   <div id="cards" class="headRef-dependent">
-    <h3>Red/Yellow Cards</h3>
+    <h3 id="teamTitle">Red/Yellow Cards</h3>
     <div class="alliance-cards" id="redCards">
       {{range $i := seq 3}}
       {{template "teamCard" dict "alliance" "red" "position" $i}}
@@ -21,27 +21,15 @@ Modified for 2026 REBUILT Game
       {{end}}
     </div>
     <div id="scoringStatuses">
-      <div class="scoring-status" id="redNearScoreStatus"></div>
-      <!-- <div class="scoring-status" id="redFarScoreStatus"></div> -->
-      <div class="scoring-status" id="blueNearScoreStatus"></div>
-      <!-- <div class="scoring-status" id="blueFarScoreStatus"></div> -->
+      <div class="scoring-status" id="redScoreStatus"></div>
+      <div class="scoring-status" id="blueScoreStatus"></div>
     </div>
   </div>
-
   <div id="fouls">
     <div id="scoreSummary" class="headRef-dependent">
       {{template "scoreSummary" dict "id" "blueScoreSummary"}}
       {{template "scoreSummary" dict "id" "redScoreSummary"}}
     </div>
-      <div class="navigation-buttons" style="margin: 10px; display: flex; gap: 10px;">
-      <button class="btn btn-primary" onclick="window.location.href='/panels/scoring/blue_near'">
-        Blue Scoring Panel
-      </button>
-      <button class="btn btn-danger" onclick="window.location.href='/panels/scoring/red_near'">
-        Red Scoring Panel
-      </button>
-
-  </div>
     <h3>Fouls</h3>
     <div id="foulButtons">
       <div class="foul-button blue-foul" onclick="addFoul('blue', false);">Blue</div>
@@ -52,33 +40,65 @@ Modified for 2026 REBUILT Game
     <div id="foulList"></div>
   </div>
 </div>
-
-
 <p>Note: Team and rule assignment are optional.</p>
-
 <div id="controlButtons" class="headRef-dependent">
   <div class="control-button" id="volunteerButton" onclick="signalVolunteers();">Signal Count</div>
   <div class="control-button" id="resetButton" onclick="signalReset();">Signal Reset</div>
-  <div class="control-button" id="commitButton" onclick="commitMatch();">Commit Match</div>
+  <div class="control-button" id="commitButton" onclick="confirmCommit();">Commit & Post</div>
+</div>
+<div id="confirmCommit" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Scores not committed</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to commit and post without all scoring tablets having committed?
+      </div>
+      <div class="modal-footer">
+        <form class="form-horizontal">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary ms-2" onclick="commitAndPost();" data-bs-dismiss="modal">
+            Commit & Post
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="confirmBypass" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="confirmBypassTitle">Disable?</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-footer">
+        <form class="form-horizontal">
+          <button type="button" class="btn btn-lg btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-lg btn-danger ms-2" onclick="toggleBypass();" data-bs-dismiss="modal" id="confirmBypassAction">
+            Disable
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {{end}}
-
 {{define "head"}}
 <link rel="manifest" href="/static/manifest/referee.manifest">
 <meta name="viewport" content="width=device-width, user-scalable=no">
 <link href="/static/css/referee_panel.css" rel="stylesheet">
 {{end}}
-
 {{define "script"}}
 <script src="/static/js/match_timing.js"></script>
 <script src="/static/js/referee_panel.js"></script>
 {{end}}
-
 {{define "teamCard"}}
-<div class="team-card" id="{{.alliance}}Team{{.position}}Card" data-alliance="{{.alliance}}" data-position="{{.position}}" onclick="cycleCard(this);">
+<div class="team-card" id="{{.alliance}}{{.position}}Card" data-alliance="{{.alliance}}" data-station="{{slice .alliance 0 1}}{{.position}}" onclick="cycleCard(this);">
 </div>
 {{end}}
-
 {{define "scoreSummary"}}
 <div id="{{.id}}" class="scoreSummary">
   <div class="placeholder"></div>
@@ -86,30 +106,14 @@ Modified for 2026 REBUILT Game
   <div class="team-2">0</div>
   <div class="team-3">0</div>
 
-  <div class="label">Auto Tower L1</div>
-  <div class="tower-symbol team-1-tower" id="red-tower-0">❌</div>
-  <div class="tower-symbol team-2-tower" id="red-tower-1">❌</div>
-  <div class="tower-symbol team-3-tower" id="red-tower-2">❌</div>
+  <div class="label">Auto Tower</div>
+  <div class="tower-status team-1-auto-tower" data-status="0">None</div>
+  <div class="tower-status team-2-auto-tower" data-status="0">None</div>
+  <div class="tower-status team-3-auto-tower" data-status="0">None</div>
 
-  <div class="label">Fuel</div>
-  <div class="wide-row">
-    <span style="color: yellow">
-      Auto: <span class="fuel-auto">0</span>
-    </span>
-    <span style="margin: 0 20px;"></span>
-    Teleop: <span class="fuel-teleop">0</span>  
-  </div>
-
-  <div class="label">Tower</div>
-  <div class="team-1-endgame">None</div>
-  <div class="team-2-endgame">None</div>
-  <div class="team-3-endgame">None</div>
-
-  <div class="label">RP Status</div>
-  <div class="wide-row" style="font-size: 0.8em;">
-    Energized: <span class="Energized-status">No</span><br/>
-    Supercharged: <span class="supercharged-status">No</span><br/>
-    Traversal: <span class="traversal-status">No</span>
-  </div>
+  <div class="label">Endgame Tower</div>
+  <div class="tower-status team-1-endgame-tower" data-status="0">None</div>
+  <div class="tower-status team-2-endgame-tower" data-status="0">None</div>
+  <div class="tower-status team-3-endgame-tower" data-status="0">None</div>
 </div>
 {{end}}

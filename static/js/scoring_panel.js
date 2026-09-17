@@ -1,187 +1,186 @@
-// scoring_panel.js
+// Copyright 2014 Team 254. All Rights Reserved.
+// Author: pat@patfairbank.com (Patrick Fairbank)
+// Author: ian@yann.io (Ian Thompson)
+//
+// Client-side logic for the scoring interface.
+
 var websocket;
-matchTiming = {
-    AutoDurationSec: 15,
-    WarmupDurationSec: 0,
-    TeleopDurationSec: 135,
-    PauseDurationSec: 0,
-    TimeoutDurationSec: 0
+let alliance;
+let committed = false;
+
+// True when scoring controls in general should be available
+let scoringAvailable = false;
+// True when the commit button should be available
+let commitAvailable = false;
+
+let localFoulCounts = {
+  "red-minor": 0,
+  "blue-minor": 0,
+  "red-major": 0,
+  "blue-major": 0,
+}
+
+const foulsDialog = $("#fouls-dialog")[0];
+const showFoulsDialog = function () {
+  foulsDialog.showModal();
+}
+const closeFoulsDialog = function () {
+  foulsDialog.close();
+}
+const closeFoulsDialogIfOutside = function (event) {
+  if (event.target === foulsDialog) {
+    closeFoulsDialog();
+  }
+}
+
+// Handles a websocket message to update the teams for the current match.
+const handleMatchLoad = function (data) {
+  $("#matchName").text(data.Match.LongName);
+  if (alliance === "red") {
+    $(".team-1 .team-num").text(data.Match.Red1);
+    $(".team-2 .team-num").text(data.Match.Red2);
+    $(".team-3 .team-num").text(data.Match.Red3);
+  } else {
+    $(".team-1 .team-num").text(data.Match.Blue1);
+    $(".team-2 .team-num").text(data.Match.Blue2);
+    $(".team-3 .team-num").text(data.Match.Blue3);
+  }
 };
 
+const renderLocalFoulCounts = function () {
+  for (const foulType in localFoulCounts) {
+    const count = localFoulCounts[foulType];
+    $(`#foul-${foulType} .fouls-local`).text(count)
+  }
+}
 
-// 1. 初始化連線邏輯 (自動執行)
+const renderGlobalFoulCounts = function (redFouls, blueFouls) {
+  $(`#foul-blue-minor .fouls-global`).text(blueFouls.filter(foul => !foul.IsMajor).length)
+  $(`#foul-blue-major .fouls-global`).text(blueFouls.filter(foul => foul.IsMajor).length)
+  $(`#foul-red-minor .fouls-global`).text(redFouls.filter(foul => !foul.IsMajor).length)
+  $(`#foul-red-major .fouls-global`).text(redFouls.filter(foul => foul.IsMajor).length)
+}
+
+const resetFoulCounts = function () {
+  localFoulCounts["red-minor"] = 0;
+  localFoulCounts["blue-minor"] = 0;
+  localFoulCounts["red-major"] = 0;
+  localFoulCounts["blue-major"] = 0;
+  renderLocalFoulCounts();
+}
+
+const addFoul = function (alliance, isMajor) {
+  const foulType = `${alliance}-${isMajor ? "major" : "minor"}`;
+  localFoulCounts[foulType] += 1;
+  renderLocalFoulCounts();
+  websocket.send("addFoul", {Alliance: alliance, IsMajor: isMajor});
+}
+
+// Handles a websocket message to update the match status.
+const handleMatchTime = function (data) {
+  switch (matchStates[data.MatchState]) {
+    case "AUTO_PERIOD":
+    case "PAUSE_PERIOD":
+    case "TELEOP_PERIOD":
+      scoringAvailable = true;
+      commitAvailable = false;
+      committed = false;
+      break;
+    case "POST_MATCH":
+      if (!committed) {
+        scoringAvailable = true;
+        commitAvailable = true;
+      }
+      break;
+    default:
+      scoringAvailable = false;
+      commitAvailable = false;
+      committed = false;
+      resetFoulCounts();
+  }
+  updateUIMode();
+};
+
+// Clear any local ephemeral state that is not maintained by the server
+const resetLocalState = function () {
+  committed = false;
+  updateUIMode();
+}
+
+// Refresh which UI controls are enabled/disabled
+const updateUIMode = function () {
+  $(".scoring-button").prop('disabled', !scoringAvailable);
+  $(".scoring-tower-button").prop('disabled', !scoringAvailable);
+  $("#commit").prop('disabled', !commitAvailable);
+}
+
+const endgameStatusNames = [
+  "None",
+  "Level 1",
+  "Level 2",
+  "Level 3",
+];
+
+// Handles a websocket message to update the realtime scoring fields.
+const handleRealtimeScore = function (data) {
+  let realtimeScore;
+  if (alliance === "red") {
+    realtimeScore = data.Red;
+  } else {
+    realtimeScore = data.Blue;
+  }
+  const score = realtimeScore.Score;
+
+  for (let i = 0; i < 3; i++) {
+    const i1 = i + 1;
+    for (let j = 0; j < endgameStatusNames.length; j++) {
+      $(`#auto-input-${i1} .tower-${j}`).attr("data-selected", j == score.AutoTowerStatuses[i]);
+      $(`#endgame-input-${i1} .tower-${j}`).attr("data-selected", j == score.EndgameTowerStatuses[i]);
+    }
+  }
+
+  const redFouls = data.Red.Score.Fouls || [];
+  const blueFouls = data.Blue.Score.Fouls || [];
+  renderGlobalFoulCounts(redFouls, blueFouls);
+};
+
+// Websocket message senders for various buttons
+const handleAutoTowerClick = function (teamPosition, autoTowerStatus) {
+  websocket.send("autoTower", {TeamPosition: teamPosition, AutoTowerStatus: autoTowerStatus});
+}
+const handleEndgameClick = function (teamPosition, endgameTowerStatus) {
+  websocket.send("endgame", {TeamPosition: teamPosition, EndgameTowerStatus: endgameTowerStatus});
+}
+
+// Sends a websocket message to indicate that the score for this alliance is ready.
+const commitMatchScore = function () {
+  websocket.send("commitMatch");
+
+  committed = true;
+  scoringAvailable = false;
+  commitAvailable = false;
+  updateUIMode();
+};
+
 $(function () {
-    if (typeof position === 'undefined') {
-        position = window.location.href.split("/").slice(-1)[0];
-    }
-    
-    // 使用 CheesyWebsocket 物件掛載所有接收事件
-    websocket = new CheesyWebsocket("/panels/scoring/" + position + "/websocket", {
-      onopen: function() {
-        websocket.send("subscribe", {}); 
-        // 嘗試觸發一次獲取分數的動作（這取決於後端支援什麼指令，有些是 "refresh" 或 "get_score"）
-        websocket.send("fuel", { Adjustment: 0, Autonomous: true }); 
-        console.log("Subscribed and sent initial refresh.");
-        }, 
-        matchTiming: function (event) {
-            handleMatchTiming(event.data); // 這會幫 match_timing.js 填入 matchTiming 變數
-        },
-        matchTime: function (event) {
-            handleMatchTime(event.data);
-        },
-        realtimeScore: function (event) {
-            handleRealtimeScore(event.data);
-        },
-        resetLocalState: function (event) {
-            resetLocalState();
-        },
-        matchLoad: function (event) {
-            handleMatchLoad(event.data); 
-        },
-    });
+  position = window.location.href.split("/").slice(-1)[0];
+  alliance = position;
+  $(".container").attr("data-alliance", alliance);
+  resetLocalState();
+
+  // Set up the websocket back to the server.
+  websocket = new CheesyWebsocket("/panels/scoring/" + position + "/websocket", {
+    matchLoad: function (event) {
+      handleMatchLoad(event.data);
+    },
+    matchTime: function (event) {
+      handleMatchTime(event.data);
+    },
+    realtimeScore: function (event) {
+      handleRealtimeScore(event.data);
+    },
+    resetLocalState: function (event) {
+      resetLocalState();
+    },
+  });
 });
-
-// 2. 處理時間顯示與 UI 狀態切換
-function handleMatchTime(data) {
-    if (!matchTiming) return;
-
-    translateMatchTime(data, function (matchState, matchStateText, countdownSec) {
-        // 1. 更新倒數時間
-        $("#match_time").text(getCountdownString(countdownSec));
-        
-        // 2. 更新比賽狀態文字 (使用 translate 產生的標準文字)
-        $("#match_state").text(matchStateText);
-
-        // 3. 處理 UI 透明度切換與按鈕啟用
-        if (matchState === "AUTO_PERIOD") {
-            $("#auto-panel").css("opacity", "1");
-            $("#teleop-panel").css("opacity", "0.5");
-            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
-                $("#commit_btn").prop("disabled", true).text("WAIT FOR MATCH END");
-            }
-        } else if (matchState === "TELEOP_PERIOD") {
-            $("#auto-panel").css("opacity", "0.5");
-            $("#teleop-panel").css("opacity", "1");
-            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
-                $("#commit_btn").prop("disabled", true).text("WAIT FOR MATCH END");
-            }
-        } else if (matchState === "POST_MATCH") {
-            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
-                var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
-                $("#commit_btn").prop("disabled", false).text("COMMIT SCORE").removeClass("btn-secondary").addClass(btnClass);
-            }
-        } else {
-            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
-                var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
-                $("#commit_btn").prop("disabled", true).text("WAIT FOR MATCH END").removeClass("btn-secondary").addClass(btnClass);
-            }
-        }
-    });
-
-    // Hub 狀態同步
-    if (data.HubActiveRed !== undefined) {
-        updateHubUI(data.HubActiveRed, data.HubActiveBlue);
-    }
-}
-
-// 3. 處理分數同步更新
-function handleRealtimeScore(data) {
-    var myScore = (alliance === "red") ? data.Red.Score : data.Blue.Score;
-    if (!myScore) return;
-
-    // Check MatchState from realtimeScore payload to safeguard commit button
-    if (data.MatchState !== undefined) {
-        var matchStateStr = matchStates[data.MatchState];
-        if (matchStateStr === "POST_MATCH") {
-            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
-                var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
-                $("#commit_btn").prop("disabled", false).text("COMMIT SCORE").removeClass("btn-secondary").addClass(btnClass);
-            }
-        } else if (matchStateStr === "AUTO_PERIOD" || matchStateStr === "TELEOP_PERIOD" || matchStateStr === "PRE_MATCH") {
-            if ($("#commit_btn").text().indexOf("COMMITTED") === -1) {
-                var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
-                $("#commit_btn").prop("disabled", true).text("WAIT FOR MATCH END").removeClass("btn-secondary").addClass(btnClass);
-            }
-        }
-    }
-
-    // 更新 Hub 狀態顏色
-    updateHubUI(data.Red.Score.HubActive, data.Blue.Score.HubActive);
-
-    // 同步數值到畫面上
-    $("#auto_fuel_count").text(myScore.AutoFuelCount);
-    $("#teleop_fuel_count").text(myScore.TeleopFuelCount);
-
-    for (var i = 0; i < 3; i++) {
-        $("#auto_tower_" + i).prop("checked", myScore.AutoTowerLevel1[i]);
-        var status = myScore.EndgameStatuses[i];
-        $(`input[name=climb_${i}][value=${status}]`).prop("checked", true);
-    }
-}
-function handleMatchLoad(data) {
-    // 1. 更新比賽場次名稱 (例如: Qualification 3)
-    $("#match_name_display").text(data.Match.LongName);
-
-    // 2. 根據你的聯盟顏色 (red/blue)，更新畫面上的隊伍編號
-    // 假設你的 HTML 有 id="team_0", id="team_1", id="team_2"
-    if (alliance === "red") {
-        $("#team_0_label").text(data.Match.Red1);
-        $("#team_1_label").text(data.Match.Red2);
-        $("#team_2_label").text(data.Match.Red3);
-    } else {
-        $("#team_0_label").text(data.Match.Blue1);
-        $("#team_1_label").text(data.Match.Blue2);
-        $("#team_2_label").text(data.Match.Blue3);
-    }
-    
-    console.log("Match Loaded: " + data.Match.LongName);
-}
-
-// 4. Hub 狀態變色邏輯
-function updateHubUI(redActive, blueActive) {
-    var indicator = $("#hub-status-indicator");
-    var card = $("#hub-status-card");
-
-    // 如果後端傳來 undefined，預設為 false
-    redActive = !!redActive; 
-    blueActive = !!blueActive;
-
-    if (redActive && blueActive) {
-        indicator.text("BOTH ACTIVE").css({"background-color": "#198754", "color": "white"});
-        card.css("border-color", "#198754");
-    } else if (redActive) {
-        indicator.text("RED ACTIVE").css({"background-color": "#dc3545", "color": "white"});
-        card.css("border-color", "#dc3545");
-    } else if (blueActive) {
-        indicator.text("BLUE ACTIVE").css({"background-color": "#0d6efd", "color": "white"});
-        card.css("border-color", "#0d6efd");
-    } else {
-        // 這是預設狀態：兩邊都沒啟動或資料尚未到達
-        indicator.text("HUB INACTIVE").css({"background-color": "#6c757d", "color": "white"});
-        card.css("border-color", "#6c757d");
-    }
-}
-
-// 5. 按鈕指令發送函式 (與 HTML onclick 名稱對應)
-function updateFuel(isAuto, delta) {
-    websocket.send("fuel", { Adjustment: delta, Autonomous: isAuto });
-}
-
-function updateAutoTower(robotIdx, checked) {
-    websocket.send("auto_tower", { RobotIndex: robotIdx, Adjustment: checked ? 1 : 0 });
-}
-
-function updateClimb(robotIdx, level) {
-    websocket.send("climb", { RobotIndex: parseInt(robotIdx), Level: parseInt(level) });
-}
-
-function commitScore() {
-    websocket.send("commitMatch", {});
-    var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
-    $("#commit_btn").text("SCORE COMMITTED").addClass("btn-secondary").removeClass(btnClass).prop("disabled", true);
-}
-
-function resetLocalState() {
-    var btnClass = (alliance === "red") ? "btn-danger" : "btn-primary";
-    $("#commit_btn").text("WAIT FOR MATCH END").prop("disabled", true).removeClass("btn-secondary").removeClass("btn-danger").removeClass("btn-primary").addClass(btnClass);
-}

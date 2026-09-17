@@ -21,7 +21,7 @@ UI for controlling the alliance selection process.
     </form>
   </div>
   {{else}}
-  <div class="col-lg-2">
+  <div class="col-lg-3">
     <legend>Alliance Selection</legend>
     <div class="mb-2">
       <button type="submit" class="btn btn-primary" form="alliancesForm">Update</button>
@@ -120,76 +120,25 @@ UI for controlling the alliance selection process.
       </div>
     </form>
   </div>
-  <div class="col-lg-5">
-    <style>
-      .team-grid-container {
-        max-height: 75vh;
-        overflow-y: auto;
-        padding-right: 5px;
-      }
-      .team-tile {
-        display: flex;
-        flex-direction: row;
-        border-radius: 6px;
-        overflow: hidden;
-        cursor: pointer;
-        border: 1px solid #ccc;
-        transition: all 0.15s ease-in-out;
-        user-select: none;
-      }
-      .team-tile:hover {
-        border-color: #0d6efd;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      }
-      .team-tile.selected-tile {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-      }
-      .team-rank {
-        width: 38px;
-        background-color: #0dcaf0;
-        color: #000;
-        font-weight: bold;
-        text-align: center;
-        padding: 6px 0;
-        font-size: 1.1em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .team-body {
-        background-color: #f8f9fa;
-        color: #212529;
-        font-weight: bold;
-        padding: 6px 14px;
-        font-size: 1.15em;
-        border-left: 2px solid #0dcaf0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 68px;
-      }
-      .team-tile.captain-candidate .team-rank {
-        background-color: #ffcd00;
-      }
-      .team-tile.captain-candidate .team-body {
-        border-left-color: #ffcd00;
-      }
-    </style>
-    <legend>Available Teams</legend>
-    <div class="team-grid-container">
-      <div id="availableTeamsGrid" class="d-flex flex-wrap gap-2">
+  <div class="col-lg-2">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Team</th>
+        </tr>
+      </thead>
+      <tbody>
         {{range $team := .RankedTeams}}
         {{if not $team.Picked}}
-        <div class="team-tile" onclick="onTeamTileClick(this, {{$team.TeamId}});">
-          <div class="team-rank">{{$team.Rank}}</div>
-          <div class="team-body">{{$team.TeamId}}</div>
-        </div>
+        <tr>
+          <td>{{$team.Rank}}</td>
+          <td>{{$team.TeamId}}</td>
+        </tr>
         {{end}}
         {{end}}
-      </div>
-    </div>
+      </tbody>
+    </table>
   </div>
   {{end}}
 </div>
@@ -248,38 +197,6 @@ UI for controlling the alliance selection process.
   $(function () {
     var startTime = moment(new Date()).hour(13).minute(0).second(0);
     newDateTimePicker("startTimePicker", startTime.toDate());
-
-    // Dynamically calculate remaining captain slots and highlight captain candidates
-    let captainSlotsRemaining = 0;
-    $("input[name^='selection'][name$='_0']").each(function() {
-      if ($(this).val() === "") {
-        captainSlotsRemaining++;
-      }
-    });
-    $("#availableTeamsGrid .team-tile").slice(0, captainSlotsRemaining).addClass("captain-candidate");
   });
-
-  function onTeamTileClick(element, teamId) {
-    // Find the currently focused text input field
-    let activeInput = $("input[type='text']:focus");
-    if (activeInput.length === 0) {
-      // If none focused, check for input with autofocus
-      activeInput = $("input[autofocus]");
-    }
-    if (activeInput.length === 0 || !activeInput.attr("name") || activeInput.attr("name").indexOf("selection") !== 0) {
-      // Fallback: find the first empty text input in alliancesForm
-      activeInput = $("#alliancesForm input[type='text']").filter(function() { return this.value === ""; }).first();
-    }
-    
-    if (activeInput.length > 0) {
-      activeInput.val(teamId);
-      activeInput.parent().addClass('has-warning');
-      // Highlight selected tile
-      $(".team-tile").removeClass("selected-tile");
-      $(element).addClass("selected-tile");
-      // Focus back to the input field so operator can press Enter to update
-      activeInput.focus();
-    }
-  }
 </script>
 {{end}}
