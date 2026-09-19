@@ -102,7 +102,7 @@ html {
   font-family: 'Arboto Bold', sans-serif;
   font-weight: 700;  /* bold */
   font-size: 25px;
-  line-height: 25px;
+  line-height: 23px;
   border: 1px solid #000;
 
 }
@@ -228,8 +228,8 @@ html {
 }
 
 .coral-icon {
-  width: 40px;
-  margin: 0 12px;
+  width: 35px;
+  /*margin: 0 12px;*/
 }
 .algae-icon {
   width: 35px;
@@ -269,7 +269,7 @@ html {
   font-family: 'Arboto Bold', sans-serif;
   font-weight: 700;  /* bold */
   font-size: 27px;
-  line-height: 27px;
+  line-height: 25px;
   color: #fff;
 }
 #matchCircle {
@@ -1249,7 +1249,7 @@ body[data-reversed="false"] .blinds.background {
 
 #matchOverlayContainer {
   position: relative;
-  width: min(1000px, calc(100vw - 40px));
+  width: min(950px, calc(100vw - 40px));
   height: 105px;
   margin: 0 auto;
   align-items: flex-start;
@@ -1360,22 +1360,22 @@ body[data-reversed="false"] .blinds.background {
 
 body[data-reversed="true"] #leftTeams,
 body[data-reversed="false"] #rightTeams {
-  background: #800e13;
+  background: #820e0f;
 }
 
 body[data-reversed="true"] #rightTeams,
 body[data-reversed="false"] #leftTeams {
-  background: #004173;
+  background: #023f71;
 }
 
 body[data-reversed="true"] #leftTeams .team:nth-child(2),
 body[data-reversed="false"] #rightTeams .team:nth-child(2) {
-  background: #5f0b0c;
+  background: #60090b;
 }
 
 body[data-reversed="true"] #rightTeams .team:nth-child(2),
 body[data-reversed="false"] #leftTeams .team:nth-child(2) {
-  background: #003258;
+  background: #003152;
 }
 
 #leftTeams {
@@ -1428,13 +1428,13 @@ body[data-reversed="false"] #leftTeams .team:nth-child(2) {
 /* reversed=true：左紅、右藍 */
 body[data-reversed="true"] #leftWrapper .score,
 body[data-reversed="false"] #rightWrapper .score {
-  background: #ed1c24 !important;
+  background: #eb1c22 !important;
 }
 
 /* reversed=true：右藍；reversed=false：左藍 */
 body[data-reversed="true"] #rightWrapper .score,
 body[data-reversed="false"] #leftWrapper .score {
-  background: #129bd3 !important;
+  background: #0165b2 !important;
 }
 
 #leftWrapper .score {
@@ -1538,12 +1538,12 @@ body[data-match-state="TELEOP_PERIOD"] .shift-info-wrapper {
 
 #left_Hubactive {
   left: auto;
-  right: calc(100% + 14px);
+  right: calc(100% + 40px);
 }
 
 #right_Hubactive {
   right: auto;
-  left: calc(100% + 14px);
+  left: calc(100% + 340px);
 }
 
 .hub-active-arrow {
@@ -1561,15 +1561,15 @@ body[data-match-state="POST_MATCH"] .coopertition {
 .external-score-fields {
   position: absolute;
   top: 50px;
-  width: 180px !important;
-  height: 40px;
-  min-height: 40px;
-  padding: 0 12px;
+  width: 130px !important;
+  height: 35px;
+  min-height: 35px;
+  /*padding: 0 12px;*/
   display: none;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  border-radius: 3px;
+  /* border-radius: 3px; */
   color: #fff;
   filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.3));
   transform: translateY(-50%);
@@ -1577,34 +1577,34 @@ body[data-match-state="POST_MATCH"] .coopertition {
 }
 
 .external-score-fields-left {
-  right: calc(100% + 80px);
+  right: calc(100% + 130px);
 }
 
 .external-score-fields-right {
-  left: calc(100% + 80px);
+  left: calc(100% + 130px);
 }
 
 body[data-reversed="true"] .external-score-fields-left,
 body[data-reversed="false"] .external-score-fields-right {
-  background: #ed1c24;
+  background: #eb1c22;
 }
 
 body[data-reversed="false"] .external-score-fields-left,
 body[data-reversed="true"] .external-score-fields-right {
-  background: #087fbd;
+  background: #0065b2;
 }
 
 .external-score-fields .score-field > div {
   min-width: 95px;
   color: #fff;
-  font-size: 22px;
+  font-size: 18px;
   white-space: nowrap;
 }
 
-.coral-icon {
+/*.coral-icon {
   width: 30px;
   margin: 0 6px;
-}
+}*/
 
 /* Official 2026 playoff scoreboard. Every rule is playoff-scoped so that the
    existing qualification Match Intro and Match Play layout remains unchanged. */
