@@ -9,7 +9,11 @@ Display shown on the audience screen overlayed over the video.
   <head>
     <title>Audience Display - {{.EventSettings.Name}} - Cheesy Arena </title>
     <link rel="shortcut icon" href="/static/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/lib/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/css/lib/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/static/css/cheesy-arena.css"/>
     <link rel="stylesheet" href="/static/css/audience_display.css"/>
   </head>
@@ -85,7 +89,14 @@ Display shown on the audience screen overlayed over the video.
         <span id="leftPlayoffAllianceWins"></span>&nbsp;-&nbsp;<span id="rightPlayoffAllianceWins"></span>
       </div>
       <div class="text-center" id="matchCircle">
-        <img id="logo" src="/static/img/game-logo.png" alt="logo"/>
+        <div class="shift-info-wrapper">
+          <div id="shiftCounter" style="display: none; font-family: 'Arboto Bold'; font-size: 24px; color: #222; text-align: center;">
+          <span id="currentShift">1</span>/6
+          </div>
+          <div id="shiftTime">:</div>
+        </div>
+        
+        <img id="logo" src="/static/img/game-logo.png" alt="logo" />
         <div id="matchTime"></div>
       </div>
       <div id="timeoutDetails">
@@ -96,6 +107,7 @@ Display shown on the audience screen overlayed over the video.
         </div>
       </div>
     </div>
+    <!-- final 畫面-->
     <div id="blindsContainer">
       <div class="blinds right background">
         <div class="blindsCenter blank"></div>
@@ -138,6 +150,23 @@ Display shown on the audience screen overlayed over the video.
                 </div>
                 {{end}}
               </div>
+              <div class="playoff-hidden-field final-rank-point">
+                <div class="final-rank-point-text">RANKING POINTS<br/></div>
+                <div id="leftFinalEnergizedBonusRankingPoint">
+                  <img src="/static/img/energizedRP.png" class="RP-block ">
+                </div>
+                <div id="leftFinalSuperchargedBonusRankingPoint">
+                  <img src="/static/img/superRP.png" class="RP-block ">
+                </div>
+                <div class="traversal-bonus-field" id="leftFinalTraversalBonusRankingPoint">
+                  <img src="/static/img/towerRP.png" class="RP-block ">
+                </div>
+                <div id="leftFinalRankingPoints" style="  display: flex;  flex-direction: row;">
+                  <img src="/static/img/winRP.png" class="RP-block">
+                  <img src="/static/img/winRP.png" class="RP-block">
+                  <img src="/static/img/winRP.png" class="RP-block">
+                </div>
+              </div>
               <div class="playoff-only-field">
                 <div class="final-destination" id="leftFinalDestination"></div>
               </div>
@@ -148,12 +177,6 @@ Display shown on the audience screen overlayed over the video.
               <div id="leftFinalTeleopFuelPoints"></div>
               <div id="leftFinalTeleopTowerPoints"></div>
               <div id="leftFinalFoulPoints"></div>
-              <div class="playoff-hidden-field">
-                <div id="leftFinalEnergizedBonusRankingPoint"></div>
-                <div id="leftFinalSuperchargedBonusRankingPoint"></div>
-                <div class="traversal-bonus-field" id="leftFinalTraversalBonusRankingPoint"></div>
-                <div id="leftFinalRankingPoints"></div>
-              </div>
               <div class="playoff-only-field">
                 <div>&nbsp;</div>
                 <div id="leftFinalWins"></div>
@@ -164,13 +187,7 @@ Display shown on the audience screen overlayed over the video.
               <div>Auto Tower</div>
               <div>Teleop Fuel</div>
               <div>Teleop Tower</div>
-              <div>Foul</div>
-              <div class="playoff-hidden-field">
-                <div>Energized Bonus</div>
-                <div>Supercharged Bonus</div>
-                <div class="traversal-bonus-field">Traversal Bonus</div>
-                <div>Ranking Points</div>
-              </div>
+              <div>PENALTY</div>
               <div class="playoff-only-field">
                 <div>&nbsp;</div>
                 <div>Wins</div>
@@ -182,12 +199,6 @@ Display shown on the audience screen overlayed over the video.
               <div id="rightFinalTeleopFuelPoints"></div>
               <div id="rightFinalTeleopTowerPoints"></div>
               <div id="rightFinalFoulPoints"></div>
-              <div class="playoff-hidden-field">
-                <div id="rightFinalEnergizedBonusRankingPoint"></div>
-                <div id="rightFinalSuperchargedBonusRankingPoint"></div>
-                <div class="traversal-bonus-field" id="rightFinalTraversalBonusRankingPoint"></div>
-                <div id="rightFinalRankingPoints"></div>
-              </div>
               <div class="playoff-only-field">
                 <div>&nbsp;</div>
                 <div id="rightFinalWins"></div>
@@ -209,6 +220,23 @@ Display shown on the audience screen overlayed over the video.
                   </div>
                 </div>
                 {{end}}
+              </div>
+              <div class="playoff-hidden-field final-rank-point">
+                <div class="final-rank-point-text">RANKING POINTS<br/></div>
+                <div id="rightFinalEnergizedBonusRankingPoint">
+                  <img src="/static/img/energizedRP.png" class="RP-block ">
+                </div>
+                <div id="rightFinalSuperchargedBonusRankingPoint">
+                  <img src="/static/img/superRP.png" class="RP-block ">
+                </div>
+                <div id="rightFinalTraversalBonusRankingPoint">
+                  <img src="/static/img/towerRP.png" class="RP-block ">
+                </div>
+                <div id="rightFinalRankingPoints" style="  display: flex;  flex-direction: row;">
+                  <img src="/static/img/winRP.png" class="RP-block">
+                  <img src="/static/img/winRP.png" class="RP-block">
+                  <img src="/static/img/winRP.png" class="RP-block">
+                </div>
               </div>
               <div class="playoff-only-field">
                 <div class="final-destination" id="rightFinalDestination"></div>

@@ -94,7 +94,33 @@ const handleMatchLoad = function (data) {
 
 // Handles a websocket message to update the match time countdown.
 const handleMatchTime = function (data) {
-  DisplayShared.handleMatchTime(data);
+  translateMatchTime(data, function (matchState, matchStateText, countdownSec) {
+    $("body").attr("data-match-state", matchState);
+    $("#matchTime").text(matchState === "POST_MATCH" ? "0:00" : getCountdownString(countdownSec));
+  });
+
+  // Place the active-Hub arrow on the physical side where that alliance is displayed.
+  const setHubActive = function (side, active) {
+    const element = $(`#${side}_Hubactive`);
+    const matchInProgress = [3, 4, 5].includes(data.MatchState);
+    if (!matchInProgress || !active) {
+      element.empty();
+      return;
+    }
+    element.html(
+      `<img class="hub-active-arrow" src="/static/img/hubactive_${side}.png" alt="Active Hub">`
+    );
+  };
+  setHubActive(redSide, data.HubActiveRed === true);
+  setHubActive(blueSide, data.HubActiveBlue === true);
+
+  // The official layout shows the shift row only during Teleop.
+  const isTeleop = data.MatchState === 5;
+  $("#shiftCounter, #shiftTime").toggle(isTeleop);
+  if (isTeleop) {
+    $("#currentShift").text(data.CurrentShift);
+    $("#shiftTime").text(`:${String(data.ShiftTimeSec).padStart(2, "0")}`);
+  }
 };
 
 // Handles a websocket message to update the match score.
@@ -113,7 +139,6 @@ const setFinalResultIndicator = function (side, label, result) {
   indicator.text(label);
   indicator.attr("data-result", result);
 };
-
 // Handles a websocket message to populate the final score data.
 const handleScorePosted = function (data) {
   $(".traversal-bonus-field").toggle(data.TraversalBonusEnabled);
@@ -147,31 +172,35 @@ const handleScorePosted = function (data) {
   $(`#${redSide}FinalTeleopFuelPoints`).text(data.RedScoreSummary.TeleopFuelPoints);
   $(`#${redSide}FinalTeleopTowerPoints`).text(data.RedScoreSummary.TeleopTowerPoints);
   $(`#${redSide}FinalFoulPoints`).text(data.RedScoreSummary.FoulPoints);
-  $(`#${redSide}FinalEnergizedBonusRankingPoint`).html(
-    data.RedScoreSummary.EnergizedBonusRankingPoint ? "&#x2714;" : "&#x2718;"
-  );
+  $(`#${redSide}FinalEnergizedBonusRankingPoint img`)
+    .toggleClass("RedGetRP", data.RedScoreSummary.EnergizedBonusRankingPoint)
+    .toggleClass("NoGetRP", !data.RedScoreSummary.EnergizedBonusRankingPoint);
   $(`#${redSide}FinalEnergizedBonusRankingPoint`).attr(
     "data-checked", data.RedScoreSummary.EnergizedBonusRankingPoint
   );
-  $(`#${redSide}FinalSuperchargedBonusRankingPoint`).html(
-    data.RedScoreSummary.SuperchargedBonusRankingPoint ? "&#x2714;" : "&#x2718;"
-  );
+  $(`#${redSide}FinalSuperchargedBonusRankingPoint img`)
+    .toggleClass("RedGetRP", data.RedScoreSummary.SuperchargedBonusRankingPoint)
+    .toggleClass("NoGetRP", !data.RedScoreSummary.SuperchargedBonusRankingPoint);
   $(`#${redSide}FinalSuperchargedBonusRankingPoint`).attr(
     "data-checked", data.RedScoreSummary.SuperchargedBonusRankingPoint
   );
-  $(`#${redSide}FinalTraversalBonusRankingPoint`).html(
-    data.RedScoreSummary.TraversalBonusRankingPoint ? "&#x2714;" : "&#x2718;"
-  );
+  $(`#${redSide}FinalTraversalBonusRankingPoint img`)
+    .toggleClass("RedGetRP", data.RedScoreSummary.TraversalBonusRankingPoint)
+    .toggleClass("NoGetRP", !data.RedScoreSummary.TraversalBonusRankingPoint);
   $(`#${redSide}FinalTraversalBonusRankingPoint`).attr(
     "data-checked", data.RedScoreSummary.TraversalBonusRankingPoint
   );
-  $(`#${redSide}FinalRankingPoints`).html(data.RedRankingPoints);
+  //$(`#${redSide}FinalRankingPoints`).html(data.RedRankingPoints);
   $(`#${redSide}FinalWins`).text(data.RedWins);
   const redFinalDestination = $(`#${redSide}FinalDestination`);
   redFinalDestination.html(data.RedDestination.replace("Advances to ", "Advances to<br>"));
   redFinalDestination.toggle(data.RedDestination !== "");
   redFinalDestination.attr("data-won", data.RedWon);
-
+  let $imgs1 =$(`#${redSide}FinalRankingPoints img`);
+  $imgs1.removeClass('RedGetRP');
+  let $RedWinRP = Math.max(0, data.RedRankingPoints - $('div.playoff-hidden-field.final-rank-point img.RedGetRP').length);
+  $imgs1.slice(0, $RedWinRP).addClass('RedGetRP').removeClass('NoGetRP');
+  $imgs1.slice($RedWinRP).addClass('NoGetRP').removeClass('RedGetRP');
   $(`#${blueSide}FinalScore`).text(data.BlueScoreSummary.Score);
   $(`#${blueSide}FinalAlliance`).text("Alliance " + data.Match.PlayoffBlueAlliance);
   setTeamInfo(blueSide, 1, data.Match.Blue1, getPostedCard(data, "Blue", data.Match.Blue1), data.BlueRankings);
@@ -187,31 +216,36 @@ const handleScorePosted = function (data) {
   $(`#${blueSide}FinalTeleopFuelPoints`).text(data.BlueScoreSummary.TeleopFuelPoints);
   $(`#${blueSide}FinalTeleopTowerPoints`).text(data.BlueScoreSummary.TeleopTowerPoints);
   $(`#${blueSide}FinalFoulPoints`).text(data.BlueScoreSummary.FoulPoints);
-  $(`#${blueSide}FinalEnergizedBonusRankingPoint`).html(
-    data.BlueScoreSummary.EnergizedBonusRankingPoint ? "&#x2714;" : "&#x2718;"
-  );
+  $(`#${blueSide}FinalEnergizedBonusRankingPoint img`)
+    .toggleClass("BlueGetRP", data.BlueScoreSummary.EnergizedBonusRankingPoint)
+    .toggleClass("NoGetRP", !data.BlueScoreSummary.EnergizedBonusRankingPoint);
   $(`#${blueSide}FinalEnergizedBonusRankingPoint`).attr(
     "data-checked", data.BlueScoreSummary.EnergizedBonusRankingPoint
   );
-  $(`#${blueSide}FinalSuperchargedBonusRankingPoint`).html(
-    data.BlueScoreSummary.SuperchargedBonusRankingPoint ? "&#x2714;" : "&#x2718;"
-  );
+  $(`#${blueSide}FinalSuperchargedBonusRankingPoint img`)
+    .toggleClass("BlueGetRP", data.BlueScoreSummary.SuperchargedBonusRankingPoint)
+    .toggleClass("NoGetRP", !data.BlueScoreSummary.SuperchargedBonusRankingPoint);
   $(`#${blueSide}FinalSuperchargedBonusRankingPoint`).attr(
     "data-checked", data.BlueScoreSummary.SuperchargedBonusRankingPoint
   );
-  $(`#${blueSide}FinalTraversalBonusRankingPoint`).html(
-    data.BlueScoreSummary.TraversalBonusRankingPoint ? "&#x2714;" : "&#x2718;"
-  );
+    $(`#${blueSide}FinalTraversalBonusRankingPoint img`)
+    .toggleClass("BlueGetRP", data.BlueScoreSummary.TraversalBonusRankingPoint)
+    .toggleClass("NoGetRP", !data.BlueScoreSummary.TraversalBonusRankingPoint);
   $(`#${blueSide}FinalTraversalBonusRankingPoint`).attr(
     "data-checked", data.BlueScoreSummary.TraversalBonusRankingPoint
   );
-  $(`#${blueSide}FinalRankingPoints`).html(data.BlueRankingPoints);
+  //$(`#${blueSide}FinalRankingPoints`).html(data.BlueRankingPoints);
   $(`#${blueSide}FinalWins`).text(data.BlueWins);
   const blueFinalDestination = $(`#${blueSide}FinalDestination`);
   blueFinalDestination.html(data.BlueDestination.replace("Advances to ", "Advances to<br>"));
   blueFinalDestination.toggle(data.BlueDestination !== "");
   blueFinalDestination.attr("data-won", data.BlueWon);
-
+  let $imgs2 =$(`#${blueSide}FinalRankingPoints img`);
+  $imgs2.removeClass('BlueGetRP');
+  let $BlueWinRP = Math.max(0, data.BlueRankingPoints - $('div.playoff-hidden-field.final-rank-point img.BlueGetRP').length);
+  console.log("BlueWinRP: " + $BlueWinRP);
+  $imgs2.slice(0, $BlueWinRP).addClass('BlueGetRP').removeClass('NoGetRP');
+  $imgs2.slice($BlueWinRP).addClass('NoGetRP').removeClass('BlueGetRP');
   let matchName = data.Match.LongName;
   if (data.Match.NameDetail !== "") {
     matchName += " &ndash; " + data.Match.NameDetail;

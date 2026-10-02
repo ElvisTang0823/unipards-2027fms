@@ -37,7 +37,12 @@
   background-size: 100%;
 }
 .blinds.background {
-  background-image: url("/static/img/endofmatch-bg.png");
+  background-image: url("/static/img/background_true.jpeg");
+  opacity: 0.8;/*準備match info要半透明背景*/
+}
+body[data-reversed="false"] .blinds.background {
+  background-image: url("/static/img/background_false.jpeg");
+  opacity: 0.8;/*準備match info要半透明背景*/
 }
 .blindsCenter {
   position: absolute;
@@ -161,6 +166,17 @@
   text-align: center;
   text-shadow: 0 0 3px #333;
 }
+#winVideoPlayer{
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 9999;
+  background:transparent;
+}
 #leftFinalScore {
   padding-right: 150px;
 }
@@ -270,6 +286,23 @@
   color: #fff;
   font-size: 20px;
 }
+
+
+.final-rank-point{
+  display: flex;
+  flex-wrap: wrap; /* 允許子元素超出容器時自動換行 */
+  justify-content: center;
+  margin: 15px 0px;
+  font-size: 0px;
+}
+.final-rank-point-text{
+  width: 100%;
+  text-align: center;
+  font-family: "FuturaLTBold";
+    font-size: 20px;
+}
+
+
 .final-destination {
   margin-top: 10px;
   width: 200px;
@@ -328,8 +361,8 @@
 }
 #sponsor {
   position: fixed;
-  width: 1000px;
-  height: 600px;
+  width: 100vw;
+  height: 100vh;
   top: 0;
   bottom: 0;
   left: 0;
@@ -345,8 +378,8 @@
   height: 100%;
 }
 .sponsor-image-container {
-  width: 1000px;
-  height: 500px;
+  width: 100vw;
+  height: 100vh;
   display: table-cell;
   vertical-align: middle;
 }
@@ -357,28 +390,48 @@
 #sponsor h1 {
   font-size: 60px;
   background-color: #444;
-  color: #fff;
-  padding: 0.25em;
+  color: #00000000;
+  /*padding: 0.25em;*/
   position: absolute;
   left: 0;
   bottom: 0;
   right: 0;
-  height: 96px;
+  height: calc(100vw/1920*166);
+  background-image: url('/static/img/sponsors/buttom.png');
+  background-size: contain;
 }
 #sponsor h2 {
   font-size: 6em;
-  padding-top: 145px;
+  padding-top: calc((100vh - 100vw * (166 / 1920)) / 2 - 110px);
   line-height: 110px;
 }
 #sponsor img {
-  max-width: 800px;
-  max-height: 400px;
+  max-width: 100vw;
+  max-height: 100vh;
+  top:0px;
 }
 #allianceRankingsCentering {
   position: absolute;
   height: 100%;
   left: 3em;
   top: 3em;
+}
+.RedGetRP{
+  filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="blackToExactRed" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.071 0 0 0 0.929   0 0.890 0 0 0.110   0 0 0.859 0 0.141   0 0 0 1 0"/></filter></svg>#blackToExactRed');
+  box-shadow: 0 0 5px #666;
+}
+.BlueGetRP{
+  filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="blackToBlue" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0.000   0 0.600 0 0 0.400   0 0 0.298 0 0.702   0 0 0 1 0"/></filter></svg>#blackToBlue');
+  box-shadow: 0 0 5px #666;
+}
+.NoGetRP{
+  opacity: 0.6;
+  box-shadow: 0 0 5px #666;
+}
+.RP-block{
+  width:40px;
+  height:40px;
+  margin:0px 2px;
 }
 #allianceRankings {
   max-width: 11em;
