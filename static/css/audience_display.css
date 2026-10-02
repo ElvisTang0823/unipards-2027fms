@@ -392,13 +392,15 @@ body[data-reversed="false"] .blinds.background {
   background-color: #444;
   color: #00000000;
   /*padding: 0.25em;*/
+}
+.sponsor-bottom {
   position: absolute;
   left: 0;
-  bottom: 0;
-  right: 0;
-  height: calc(100vw/1920*166);
-  background-image: url('/static/img/sponsors/buttom.png');
-  background-size: contain;
+  top: auto !important;
+  bottom: 0 !important;
+  width: 100%;
+  height: auto;
+  display: block;
 }
 #sponsor h2 {
   font-size: 6em;
