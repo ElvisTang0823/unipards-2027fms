@@ -384,7 +384,8 @@ body[data-reversed="false"] .blinds.background {
   vertical-align: middle;
 }
 #sponsor h1, #sponsor h2 {
-  font-family: "FuturaLTBold";
+  font-family: 'Arboto Bold', sans-serif;
+  font-weight: 700;  /* bold */
   margin: 0;
 }
 #sponsor h1 {
