@@ -16,10 +16,10 @@ Display for showing team rankings.
   </head>
   <body>
     <div id="column">
-      <div id="titlebar" class="row justify-content-between">
+      <!--div id="titlebar" class="row justify-content-between">
         <div class="col-lg-4 text-start">Team Standings</div>
         <div class="col-lg-4 text-end">{{.EventSettings.Name}}</div>
-      </div>
+      </div-->
       <div id="standings">
         <table id="header">
           <tr>
@@ -37,15 +37,15 @@ Display for showing team rankings.
         </table>
         <div id="container">
           <div id="scroller">
-            <table id="rankings1" class="table table-striped rankings-table"></table>
-            <table id="rankings2" class="table table-striped rankings-table"></table>
+            <table id="rankings1" class="table rankings-table"></table>
+            <table id="rankings2" class="table rankings-table"></table>
           </div>
         </div>
-        <div id="footer">
+        <!--div id="footer">
           <span id="highestPlayedMatch"></span>
-        </div>
+        </div-->
       </div>
-      <div id="earlyLateMessage"></div>
+      <!--div id="earlyLateMessage"></div -->
     </div>
     <script id="standingsTemplate" type="text/x-handlebars-template">
       <tbody>
