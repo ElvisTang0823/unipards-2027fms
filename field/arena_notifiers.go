@@ -156,6 +156,16 @@ func (arena *Arena) GenerateMatchLoadMessage() any {
 		}
 	}
 
+	matchForMessage := *arena.CurrentMatch
+	if matchForMessage.Type == model.Qualification {
+		qualificationMatches, err := arena.Database.GetMatchesByType(model.Qualification, true)
+		if err != nil {
+			log.Printf("Failed to get qualification match count while generating match load message: %v", err)
+		} else {
+			matchForMessage.LongName += " of " + strconv.Itoa(len(qualificationMatches))
+		}
+	}
+
 	matchResult, err := arena.Database.GetMatchResultForMatch(arena.CurrentMatch.Id)
 	if err != nil {
 		log.Printf("Failed to get match result for match %d while generating match load message: %v",
@@ -226,7 +236,7 @@ func (arena *Arena) GenerateMatchLoadMessage() any {
 	}{
 		playoffRedAllianceYellowCard,
 		playoffBlueAllianceYellowCard,
-		arena.CurrentMatch,
+		&matchForMessage,
 		allowManualSubstitution,
 		isReplay,
 		teams,
@@ -332,6 +342,16 @@ func (arena *Arena) GenerateScorePostedMessage() any {
 		}
 	}
 
+	savedMatchForMessage := *arena.SavedMatch
+	if savedMatchForMessage.Type == model.Qualification {
+		qualificationMatches, err := arena.Database.GetMatchesByType(model.Qualification, true)
+		if err != nil {
+			log.Printf("Failed to get qualification match count while generating score posted message: %v", err)
+		} else {
+			savedMatchForMessage.LongName += " of " + strconv.Itoa(len(qualificationMatches))
+		}
+	}
+
 	return &struct {
 		Match                   *model.Match
 		TraversalBonusEnabled   bool
@@ -358,7 +378,7 @@ func (arena *Arena) GenerateScorePostedMessage() any {
 		RedDestination          string
 		BlueDestination         string
 	}{
-		arena.SavedMatch,
+		&savedMatchForMessage,
 		arena.EventSettings.TraversalBonusThreshold != 0,
 		redScoreSummary,
 		blueScoreSummary,

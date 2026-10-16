@@ -99,11 +99,17 @@ Display shown on the audience screen overlayed over the video.
         <img id="logo" src="/static/img/game-logo.png" alt="logo" />
         <div id="matchTime"></div>
       </div>
-      <div id="timeoutDetails">
-        <div class="timeout-detail" id="timeoutBreakDescription"></div>
-        <div class="timeout-detail" id="timeoutNextMatch">
-          Next Up:<br/>
-          <span id="timeoutNextMatchName"></span>
+    </div>
+    <div id="timeoutDetails">
+      <div class="timeout-text timeout-text-timer">Match will resume shortly...</div>
+      <div id="Timeout-timer">0:00</div><!--不可以隨便套用id="matchTime"不然會變形-->
+      <div class="timeout-text timeout-text-match">After the break:</div>
+      <div class="timeout-match">
+        <div id="Timeout-Name"></div>
+        <div class="timeout-match-info">
+          <div id="timeout-match-left">ALLIANCE 0</div>
+          <div id="timeout-match-vs">VS</div>
+          <div id="timeout-match-right">ALLIANCE 0</div>
         </div>
       </div>
     </div>

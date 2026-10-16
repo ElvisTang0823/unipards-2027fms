@@ -47,6 +47,10 @@
         $(`#${blueSide}PlayoffAlliance`).text(currentMatch.PlayoffBlueAlliance);
         $(".playoff-alliance").show();
 
+        $(`#timeout-match-${redSide}`).text("ALLIANCE " + currentMatch.PlayoffRedAlliance).attr("data-reversed", reversed);
+        $(`#timeout-match-${blueSide}`).text("ALLIANCE " + currentMatch.PlayoffBlueAlliance).attr("data-reversed", reversed);
+        $(".timeout-match-info").show();
+
         if (data.Matchup.NumWinsToAdvance > 1) {
           $(`#${redSide}PlayoffAllianceWins`).text(data.Matchup.RedAllianceWins);
           $(`#${blueSide}PlayoffAllianceWins`).text(data.Matchup.BlueAllianceWins);
@@ -58,6 +62,7 @@
         $(`#${redSide}PlayoffAlliance`).text("");
         $(`#${blueSide}PlayoffAlliance`).text("");
         $(".playoff-alliance").hide();
+        $(".timeout-match-info").hide();
         $("#playoffSeriesStatus").hide();
       }
 
@@ -66,13 +71,14 @@
         matchName += " &ndash; " + data.Match.NameDetail;
       }
       $("#matchName").html(matchName);
-      const timeoutNextMatchName = data.BreakNextMatchName || "";
+      $("#Timeout-Name").html(matchName);
+      /*const timeoutNextMatchName = data.BreakNextMatchName || "";
       const timeoutDetailOpacity = $("#timeoutBreakDescription").css("opacity");
       $("#timeoutNextMatch").toggle(timeoutNextMatchName !== "").css(
         "opacity", timeoutNextMatchName === "" ? 0 : timeoutDetailOpacity
       );
       $("#timeoutNextMatchName").text(timeoutNextMatchName);
-      $("#timeoutBreakDescription").text(data.BreakDescription);
+      $("#timeoutBreakDescription").text(data.BreakDescription);*/
       return currentMatch;
     },
 

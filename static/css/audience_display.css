@@ -494,18 +494,20 @@ body[data-reversed="false"] .blinds.background {
   display: none;
   position: absolute;
   left: -1000px;
-  bottom: 100px;
+  bottom: 70px;
   background-color: #fff;
-  border: 1px solid #222;
   color: #222;
   font-size: 30px;
   width: 800px;
   height: 87px;
+  background-color: #59a0b5;
 }
 #lowerThirdLogo {
-  margin: 12px 20px;
-  height: 60px;
+  padding: 12px 20px;
+  height: 100%;
   float: left;
+  background-color: #fff;
+  margin-right: 12px;
 }
 #lowerThirdTop {
   position: relative;

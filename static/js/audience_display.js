@@ -40,7 +40,7 @@ const scoreLogoTop = "-530px";
 const bracketLogoTop = "-780px";
 const bracketLogoScale = 0.75;
 const timeoutDetailsIn = $("#timeoutDetails").css("width");
-const timeoutDetailsOut = "570px";
+const timeoutDetailsOut = "100vw";
 
 // Handles a websocket message to change which screen is displayed.
 const handleAudienceDisplayMode = function (targetScreen) {
@@ -97,6 +97,7 @@ const handleMatchTime = function (data) {
   translateMatchTime(data, function (matchState, matchStateText, countdownSec) {
     $("body").attr("data-match-state", matchState);
     $("#matchTime").text(matchState === "POST_MATCH" ? "0:00" : getCountdownString(countdownSec));
+    $("#Timeout-timer").text(matchState === "TIMEOUT_ACTIVE" ? getCountdownString(countdownSec) : "0:00");
   });
 
   // Place the active-Hub arrow on the physical side where that alliance is displayed.
@@ -324,7 +325,7 @@ const handleLowerThird = function (data) {
   const lowerThirdElement = $("#lowerThird");
   if (data.ShowLowerThird && !lowerThirdElement.is(":visible")) {
     lowerThirdElement.show();
-    lowerThirdElement.transition({queue: false, left: "150px"}, 750, "ease");
+    lowerThirdElement.transition({queue: false, left: "70px"}, 750, "ease");
   } else if (!data.ShowLowerThird && lowerThirdElement.is(":visible")) {
     lowerThirdElement.transition({queue: false, left: "-1000px"}, 1000, "ease", function () {
       lowerThirdElement.hide();
@@ -422,13 +423,16 @@ const transitionBlankToSponsor = function (callback) {
 };
 
 const transitionBlankToTimeout = function (callback) {
-  $("#overlayCentering").transition(overlayCenteringShowParams, 500, "ease", function () {
-    $("#timeoutDetails").transition({queue: false, width: timeoutDetailsOut}, 500, "ease");
-    $("#logo").transition({queue: false, top: logoUp}, 500, "ease", function () {
-      $(".timeout-detail").transition({queue: false, opacity: 1}, 750, "ease");
-      $("#matchTime").transition({queue: false, opacity: 1}, 750, "ease", callback);
+  $("#eventMatchInfo").transition({queue: false, height: eventMatchInfoUp}, 500, "ease", function () {
+    $("#eventMatchInfo").hide();
+    $(".score").transition({queue: false, width: scoreIn}, 500, "ease", function () {
+      $(".avatars").css("opacity", 0);
+      $(".avatars").hide();
+      $(".teams").hide();
+      $("#overlayCentering").transition(overlayCenteringHideParams, 1000, "ease", callback);
     });
   });
+  $("#timeoutDetails").transition({queue: false, opacity: 1}, 500, "ease");
 };
 
 const transitionBracketToBlank = function (callback) {
@@ -492,21 +496,18 @@ const transitionIntroToMatch = function (callback) {
   });
 };
 
-const transitionIntroToTimeout = function (callback) {
+/*const transitionIntroToTimeout = function (callback) {
+  $("#timeoutDetails").transition({queue: false, width: timeoutDetailsOut, opacity: 1}, 500, "ease");
   $("#eventMatchInfo").transition({queue: false, height: eventMatchInfoUp}, 500, "ease", function () {
     $("#eventMatchInfo").hide();
     $(".score").transition({queue: false, width: scoreIn}, 500, "ease", function () {
       $(".avatars").css("opacity", 0);
       $(".avatars").hide();
       $(".teams").hide();
-      $("#timeoutDetails").transition({queue: false, width: timeoutDetailsOut}, 500, "ease");
-      $("#logo").transition({queue: false, top: logoUp}, 500, "ease", function () {
-        $(".timeout-detail").transition({queue: false, opacity: 1}, 750, "ease");
-        $("#matchTime").transition({queue: false, opacity: 1}, 750, "ease", callback);
-      });
+      $("#overlayCentering").transition(overlayCenteringHideParams, 1000, "ease", callback);
     });
   });
-};
+};*/
 
 const transitionLogoToBlank = function (callback) {
   $(".blindsCenter.blank").transition({queue: false, rotateY: "360deg"}, 500, "ease");
@@ -674,18 +675,20 @@ const transitionSponsorToScore = function (callback) {
 
 const transitionTimeoutToBlank = function (callback) {
   $(".timeout-detail").transition({queue: false, opacity: 0}, 300, "linear");
+  $("#timeoutDetails").transition({queue: false, width: timeoutDetailsIn, opacity: 0}, 500, "ease");
+
   $("#matchTime").transition({queue: false, opacity: 0}, 300, "linear", function () {
-    $("#timeoutDetails").transition({queue: false, width: timeoutDetailsIn}, 500, "ease");
     $("#logo").transition({queue: false, top: logoDown}, 500, "ease", function () {
       $("#overlayCentering").transition(overlayCenteringHideParams, 1000, "ease", callback);
     });
   });
 };
 
-const transitionTimeoutToIntro = function (callback) {
+/*const transitionTimeoutToIntro = function (callback) {
   $(".timeout-detail").transition({queue: false, opacity: 0}, 300, "linear");
+  $("#timeoutDetails").transition({queue: false, width: timeoutDetailsIn, opacity: 0}, 500, "ease");
+
   $("#matchTime").transition({queue: false, opacity: 0}, 300, "linear", function () {
-    $("#timeoutDetails").transition({queue: false, width: timeoutDetailsIn}, 500, "ease");
     $("#logo").transition({queue: false, top: logoDown}, 500, "ease", function () {
       $(".avatars").css("display", "flex");
       $(".avatars").css("opacity", 1);
@@ -696,7 +699,7 @@ const transitionTimeoutToIntro = function (callback) {
       });
     });
   });
-};
+};*/
 
 // Loads sponsor slide data and builds the slideshow HTML.
 const initializeSponsorDisplay = function () {
@@ -780,6 +783,7 @@ $(function () {
     overlayCenteringHideParams = {queue: false, top: overlayCenteringTopUp * zoomFactor + "px"};
     overlayCenteringShowParams = {queue: false, top: 50 * zoomFactor + "px"};
     overlayCentering.css({transformOrigin: "center top", bottom: "auto", top: overlayCenteringHideParams.top});
+    $(timeoutDetails).css({transformOrigin: "center top", bottom: "auto", top: 0});
   } else {
     overlayCenteringHideParams = {queue: false, bottom: overlayCenteringBottomDown * zoomFactor + "px"};
     overlayCenteringShowParams = {queue: false, bottom: "0px"};
@@ -843,8 +847,7 @@ $(function () {
     },
     intro: {
       blank: transitionIntroToBlank,
-      match: transitionIntroToMatch,
-      timeout: transitionIntroToTimeout,
+      match: transitionIntroToMatch
     },
     logo: {
       blank: transitionLogoToBlank,
@@ -877,8 +880,7 @@ $(function () {
       score: transitionSponsorToScore,
     },
     timeout: {
-      blank: transitionTimeoutToBlank,
-      intro: transitionTimeoutToIntro,
+      blank: transitionTimeoutToBlank
     },
   }
 });

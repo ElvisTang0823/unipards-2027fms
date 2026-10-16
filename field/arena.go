@@ -623,6 +623,7 @@ func (arena *Arena) startTimeout(description string, nextMatchName string, durat
 	arena.LastMatchTimeSec = -1
 	arena.AllianceStationDisplayMode = "timeout"
 	arena.AllianceStationDisplayModeNotifier.Notify()
+	arena.SetAudienceDisplayMode("timeout")
 
 	if arena.EventSettings.NexusAutoQueueEnabled {
 		go arena.NexusClient.BreakStarted(durationSec)

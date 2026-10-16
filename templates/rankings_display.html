@@ -24,8 +24,8 @@ Display for showing team rankings.
         <table id="header">
           <tr>
             <td class="team-field">Rank</td>
-            <td class="team-field">Team</td>
-            <td class="team-nickname">Name</td>
+            <!--td class="team-field">Team</td-->
+            <td class="team-nickname">Team</td>
             <td class="team-field">RP</td>
             <td class="team-field">Match</td>
             <td class="team-field">Auto Fuel</td>
@@ -52,8 +52,16 @@ Display for showing team rankings.
         {{"{{#each Rankings}}"}}
         <tr>
           <td class="team-field">{{"{{../Iteration}}"}} {{"{{this.Rank}}"}}</td>
-          <td class="team-field">{{"{{this.TeamId}}"}}</td>
-          <td class="team-nickname">{{"{{this.Nickname}}"}}</td>
+          <!--td class="team-field">{{"{{this.TeamId}}"}}</td-->
+          <td class="team-nickname">
+            <div class="team-identity">
+              <img src="/api/teams/{{"{{this.TeamId}}"}}/avatar" alt="{{"{{this.TeamId}}"}}" class="team-logo"/>
+              <div class="team-info">
+                <div class="team-number">{{"{{this.TeamId}}"}}</div>
+                <div class="team-name">{{"{{this.Nickname}}"}}</div>
+              </div>
+            </div>
+          </td>
           <td class="team-field">{{"{{this.RankingPoints}}"}}</td>
           <td class="team-field">{{"{{this.MatchPoints}}"}}</td>
           <td class="team-field">{{"{{this.AutoFuelPoints}}"}}</td>
