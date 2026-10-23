@@ -288,11 +288,21 @@ const handleAllianceSelection = function (data) {
     $("#allianceSelection").html(allianceSelectionTemplate({alliances: alliances, numColumns: numColumns}));
   }
   if (rankedTeams) {
+    const captainSlotsRemaining = (alliances || [])
+      .filter(function (alliance) { return alliance.TeamIds[0] === 0; })
+      .length;
+
     let text = "";
+    let unpickedCount = 0;
     $.each(rankedTeams, function (i, v) {
+      if (unpickedCount >= 20) {
+        return false;
+      }
       if (!v.Picked) {
-        text += `<div class="unpicked"><div class="unpicked-rank">${v.Rank}.</div>` +
+        let tileClass = unpickedCount < captainSlotsRemaining ? "data-captain='true'" : "";
+        text += `<div class="unpicked"><div class="unpicked-rank" ${tileClass}>${v.Rank}</div>` +
           `<div class="unpicked-team">${v.TeamId}</div></div>`;
+        unpickedCount++;
       }
     });
     $("#allianceRankings").html(text);
@@ -300,8 +310,9 @@ const handleAllianceSelection = function (data) {
 
   if (data.ShowTimer) {
     $("#allianceSelectionTimer").text(getCountdownString(data.TimeRemainingSec));
+    $("#allianceTimerBox").show();
   } else {
-    $("#allianceSelectionTimer").html("&nbsp;");
+    $("#allianceTimerBox").hide();
   }
 };
 
@@ -332,17 +343,18 @@ const handleLowerThird = function (data) {
     });
   }
 };
-
 const transitionAllianceSelectionToBlank = function (callback) {
+  $('#allianceSelectionBackground').hide();
   $('#allianceSelectionCentering').transition({queue: false, right: "-60em"}, 500, "ease", callback);
   $('#allianceRankingsCentering.enabled').transition({queue: false, left: "-60em"}, 500, "ease");
 };
 
 const transitionBlankToAllianceSelection = function (callback) {
+  $('#allianceSelectionBackground').show();
   $('#allianceSelectionCentering').css("right", "-60em").show();
-  $('#allianceSelectionCentering').transition({queue: false, right: "3em"}, 500, "ease", callback);
+  $('#allianceSelectionCentering').transition({queue: false, right: "6vw"}, 500, "ease", callback);
   $('#allianceRankingsCentering.enabled').css("left", "-60em").show();
-  $('#allianceRankingsCentering.enabled').transition({queue: false, left: "3em"}, 500, "ease");
+  $('#allianceRankingsCentering.enabled').transition({queue: false, left: "4vw"}, 500, "ease");
 };
 
 const transitionBlankToBracket = function (callback) {

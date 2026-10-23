@@ -265,11 +265,23 @@ Display shown on the audience screen overlayed over the video.
         <img src="/static/img/sponsors/bottom.png"  class="sponsor-bottom"/>
       </div>
     </div>
+    <div id="allianceSelectionBackground" style="display: none;">
+      <img class="alliance-selection-bg" src="/static/img/alliance_selection_background.png"/>
+      <div class="alliance-selection-video-frame"></div>
+    </div>
     <div id="allianceSelectionCentering" style="display: none;">
+      <div class="alliance-header-row">
+        <span class="alliance-header-title">Alliances</span>
+        <div id="allianceTimerBox" style="display: none;">
+          <img class="alliance-timer-icon" src="/static/img/timer.png"/>
+          <div id="allianceSelectionTimer">0:00</div>
+        </div>
+      </div>
       <div id="allianceSelection"></div>
     </div>
     <div id="allianceRankingsCentering" {{if .SelectionShowUnpickedTeams}}class="enabled" {{end}}
       style="display: none;">
+      <div class="rankings-header-title">Available Teams</div>
       <div id="allianceRankings"></div>
     </div>
     <div id="lowerThird">
@@ -288,9 +300,6 @@ Display shown on the audience screen overlayed over the video.
           {{"{{/each}}"}}
         </tr>
         {{"{{/each}}"}}
-        <tr>
-          <td id="allianceSelectionTimer" colspan="{{"{{numColumns}}"}}"></td>
-        </tr>
       </table>
     </script>
     <script id="sponsorImageTemplate" type="text/x-handlebars-template">

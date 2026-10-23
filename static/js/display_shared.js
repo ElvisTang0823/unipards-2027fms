@@ -47,8 +47,8 @@
         $(`#${blueSide}PlayoffAlliance`).text(currentMatch.PlayoffBlueAlliance);
         $(".playoff-alliance").show();
 
-        $(`#timeout-match-${redSide}`).text("ALLIANCE " + currentMatch.PlayoffRedAlliance).attr("data-reversed", reversed);
-        $(`#timeout-match-${blueSide}`).text("ALLIANCE " + currentMatch.PlayoffBlueAlliance).attr("data-reversed", reversed);
+        $(`#timeout-match-${redSide}`).text("ALLIANCE " + currentMatch.PlayoffRedAlliance).attr("class", "timeout-match-red");
+        $(`#timeout-match-${blueSide}`).text("ALLIANCE " + currentMatch.PlayoffBlueAlliance).attr("class", "timeout-match-blue");
         $(".timeout-match-info").show();
 
         if (data.Matchup.NumWinsToAdvance > 1) {

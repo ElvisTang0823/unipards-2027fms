@@ -374,9 +374,9 @@ html {
   color: #000;
   margin: 0 5%;
 }
-#timeout-match-left[data-reversed=false], #timeout-match-right[data-reversed=true] {
+.timeout-match-red {
   background-color: #ED1C24;
 }
-#timeout-match-left[data-reversed=true], #timeout-match-right[data-reversed=false] {
+.timeout-match-blue {
   background-color: #0066B3;
 }
